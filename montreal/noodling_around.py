@@ -65,7 +65,7 @@ def get_unchosen_notes(parts):
     for part in parts:
         for note in part['notes']:
             if note['pitch'] == None:
-                result.append(note)
+                result.append((note, part['instrument_name']))
     return result
 
 
@@ -76,7 +76,7 @@ def main():
     
     unchosen_notes = get_unchosen_notes()
     while len(unchosen_notes) > 0:
-        note = random.choice(unchosen_notes)
+        note, instrument = random.choice(unchosen_notes)
         
         valid = False
         while not valid:
