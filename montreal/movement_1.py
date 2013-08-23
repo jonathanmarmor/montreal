@@ -208,37 +208,6 @@ class Song(object):
 
 
 class Phrase(object):
-    """
-    - instruments can have one of two types of material: solo or accompaniment
-    - solo has more notes, ornaments, and is less tied to the meter
-    - accomp has very simple rhythms that outline the meter, no ornaments, and generally longer duration notes
-    - if song.type is solo:
-        - the soloist group all play a solo part in unison
-        - all the remaining instruments play accompaniment parts. maybe some in rhythmic unison?
-    - if song.type is ensemble:
-        - everyone plays a different solo part
-
-
-    once we have all the rhythms (and maybe contours?) then use the harmony validator from movement 2 to choose the pitches
-    pitch options should be within a small range of the previous note, perhaps with the smallest intervals preferred
-
-
-
-    each part is a dict
-    {
-        'instrument_name': 'gtr'
-        'notes': []
-    }
-    each note is a dict {
-        'pitch': 44.0,
-        'duration': 2.75,
-        'glissando': 'start' ?
-        'slur': 'start' ?
-    }
-
-
-    """
-
     def __init__(self, piece, movement, song):
         self.piece = piece
         self.movement = movement
