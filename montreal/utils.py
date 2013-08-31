@@ -7,6 +7,12 @@ def scale(x, minimum, maximum, floor=0, ceiling=1):
     return ((ceiling - floor) * (float(x) - minimum))/(maximum - minimum) + floor
 
 
+def scale_list(l, floor=0, ceiling=1):
+    minimum = 0
+    maximum = sum(l)
+    return [scale(x, minimum, maximum, floor, ceiling) for x in l]
+
+
 def weighted_choice(options, weights):
     rand = random.random()
     rand = scale(rand, 0, 1, 0, sum(weights))

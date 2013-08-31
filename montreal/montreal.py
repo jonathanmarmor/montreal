@@ -68,7 +68,7 @@ class Piece(object):
             # Make the piece
             self.make_score()
             self.make_movements()
-            self.fix_rhythm_notation()
+            # self.fix_rhythm_notation()
 
     def make_score(self):
         score = self.score = Score()
@@ -85,15 +85,11 @@ class Piece(object):
 
         return score
 
-    def get_metadata(self, timestamp, movement_number=None, movement_name=None):
+    def get_metadata(self, timestamp):
         md = Metadata()
         md.title = 'Montreal'
         md.composer = 'Jonathan Marmor'
         md.date = timestamp.strftime('%Y/%m/%d')
-        if movement_number:
-            md.movementNumber = movement_number
-        if movement_name:
-            md.movementName = movement_name
         return md
 
     def make_movements(self):
@@ -101,9 +97,9 @@ class Piece(object):
         piece_duration = random.randint(2160, 2520)
         self.movement_1 = movement_1.Movement1(piece_duration, self)
 
-    def fix_rhythm_notation(self):
-        for part in self.parts.l:
-            part.makeBeams()
+    # def fix_rhythm_notation(self):
+    #     for part in self.parts.l:
+    #         part.makeBeams()
 
 
 if __name__ == '__main__':
