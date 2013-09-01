@@ -23,7 +23,7 @@ from utils import split_at_beats
 from utils import join_quarters
 import harmonic_rhythm
 import form
-import chord_types
+from chord_types import get_harmony_generator
 
 
 class Instruments(object):
@@ -163,6 +163,10 @@ class Song(object):
 
 
         """
+        self.root_sequence = []
+        self.harmony_generator = get_harmony_generator()
+        # TODO choose roots
+
         self.form = form.choose()
         self.bars = self.form.bars
 
@@ -183,9 +187,42 @@ class Song(object):
         for bar in self.bars:
             bar.parts = bar.type_obj.parts
 
-    def choose_harmony():
-        root = random.choice(range(12))
-        chord_type =
+    def choose_root(self):
+        if not self.root_sequence:
+            self.root_sequence = [random.randint(0, 11)]
+        last = self.root_sequence[-1]
+
+        root_motion = weighted_choice([
+            7,
+            5,
+            2,
+            10,
+            0,
+            3,
+            8,
+            4,
+            7,
+            1,
+            11,
+            6
+        ], [
+            .2,
+            .2,
+
+
+
+        ])
+        return (last + root_motion) % 12
+
+    def choose_harmony(self):
+        root = choose_root()
+        chord_type = self.harmony_generator.next()
+        return self.build_chord(root, chord_type)
+
+    def build_chord(root, chord_type):
+
+
+        return pitch_classes
 
 
 
