@@ -171,19 +171,13 @@ class Song(object):
             bar_type = self.form.bar_types[name]
             bar_type.harmonic_rhythm = harmonic_rhythm.choose(bar_type.duration)
 
-            for harm_dur in bar_type.harmonic_rhythm:
-
-                note = {
-                    'duration': harm_dur,
-                    'pitch': 60  # Placeholder
-                }
-                bar_type.parts[1]['notes'].append(note)
+            bar_type.parts[1]['notes']= [{
+                'duration': harm_dur,
+                'pitch': 60  # Placeholder
+            } for harm_dur in bar_type.harmonic_rhythm]
 
         for bar in self.bars:
             bar.parts = copy.deepcopy(bar.type_obj.parts)
-
-
-
 
 
 
