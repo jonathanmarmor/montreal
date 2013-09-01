@@ -1,7 +1,8 @@
+#!/usr/bin/env python
+
 import sys
 import datetime
 import random
-import copy
 
 from music21.note import Note, Rest
 from music21.pitch import Pitch
@@ -13,7 +14,13 @@ from music21.layout import StaffGroup
 from music21.tempo import MetronomeMark
 from music21.duration import Duration
 
-from utils import weighted_choice, count_intervals, frange, fill, divide, split_at_beats, join_quarters
+from utils import weighted_choice
+from utils import count_intervals
+from utils import frange
+from utils import fill
+from utils import divide
+from utils import split_at_beats
+from utils import join_quarters
 import harmonic_rhythm
 import form
 
@@ -112,17 +119,10 @@ class Piece(object):
                     # Fix Durations
                     durations = [note['duration'] for note in part['notes']]
 
-                    # print
-                    # print 'durations', durations
-                    # if durations and sum(durations) not in [2, 4, 8]:
-                    #     print durations
                     components_list = split_at_beats(durations)
-                    # print 'components_list', components_list
                     components_list = [join_quarters(note_components) for note_components in components_list]
-                    # print 'components_list', components_list
                     for note, components in zip(part['notes'], components_list):
                         note['durations'] = components
-                    # print "processed durations", [note['durations'] for note in part['notes']]
 
 
                     for note in part['notes']:
@@ -177,7 +177,9 @@ class Song(object):
             } for harm_dur in bar_type.harmonic_rhythm]
 
         for bar in self.bars:
-            bar.parts = copy.deepcopy(bar.type_obj.parts)
+            bar.parts = bar.type_obj.parts
+
+
 
 
 
@@ -193,4 +195,8 @@ if __name__ == '__main__':
         piece.score.show('midi')
 
     if 'noshow' not in sys.argv:
-        piece.score.show()
+        if 'sib' in sys.argv:
+            piece.score.show('musicxml', '/Applications/Sibelius 7.app')
+        else:
+            piece.score.show('musicxml', '/Applications/MuseScore.app')
+
