@@ -352,7 +352,7 @@ weights_8 = [
     50     #      [3, 2.5, 2.5]
 ]
 
-def choose_harmonic_rhythm(dur):
+def choose(dur):
     if dur == 2:
         return weighted_choice([[2], [1, 1]], [4, 1])
     if dur == 4:

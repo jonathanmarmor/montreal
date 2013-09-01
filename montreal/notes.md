@@ -57,17 +57,18 @@ a-b-c-b-
 a-a-b-a-
 
 
+
+
 aaba ccba
 aaba c-ba
 
 
-
-# dash means preceeding letter is twice as long
 aabac-ba
-11112-11
+
 
 a-b- a-b- cdef a-b-
 a-bc a-bc defc a-bc
+
 a--- b--- cdef a---
 a--- b--- cdef b---
 
@@ -87,3 +88,42 @@ a-b-c-b-ddb-a-b-
 
 
 aabcaabcaad-aabc
+
+
+
+
+a-b- a-b- cdef a-b-
+a-bc a-bc defc a-bc
+
+abcd abcd e--- abcd
+
+abcb abcb d--- abcb
+abcb abcd e--- abcb
+abcb abcd e-cb abcb
+abcb abcd e-cd abcb
+
+
+abac abac d--- abac
+
+
+violin:
+- exactly the same
+- same rhythm, different pitches in violin due to different harmonies
+- same rhythm, different notes: violin changes transposition and pitches adjusted to match harmony
+- same pitches and durations, but rhythm "turned around" (broken into chunks, chunks re-ordered), guitar has to change some notes in harmony to accomodate?
+- same, but different ornaments or passing tones
+- same target note, but different lead-up
+- completely different
+
+guitar:
+- exactly the same
+- same harmonies and durations, but turned around
+- put one harmony where there used to be two, put two harmonies where there used to be one
+- same rhythm, different harmonies to accomodate changes in melody
+- completely different
+
+
+
+
+
+

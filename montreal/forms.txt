@@ -45,7 +45,6 @@ a--- bcdc a--- ecfc
 abcb aded afgf ahih
 abac dedc fgfc hihc
 a-b- ccb- d-b- ecb-
-
 a-bc a-bd e-bf a-bg
 a-bc d-be f--- bcbe
 a--- a--- bcbd a---
@@ -66,12 +65,67 @@ abcb d-e- f-cb abcb
 abaa c--- d-e- abaa
 aab---ac aad---ac
 ab---ac- ad---ac-
-
-
-
-
-a-a-b-a-c---b-a-
-a-a-b-a-c---a-b-
-a-b-a-a-c---a-a-
-a-a-a-b-c---a-b-
-a-b-a-b-c---a-b-
+a-a- b-a- c--- b-a-
+a-a- b-a- c--- a-b-
+a-b- a-a- c--- a-a-
+a-a- a-b- c--- a-b-
+a-b- a-b- c--- a-b-
+a-a- b-a- c-c- b-a-
+a-a- b-a- c--- b-a-
+a-b- a-b- cdef a-b-
+a-bc a-bc defc a-bc
+a--- b--- cdef a---
+a--- b--- cdef b---
+a-bc bcbc a-a- bca-
+a-bc a-bc bcca- bcc
+abcd abcd bcda abcd
+a-b- a-b- b-a- a-b-
+a-bc d-bc e-fc a-bc
+a-b- a-b- ccdc a-b-
+a-b- c-b- ddb- c-b-
+a-b- c-b- ddb- a-b-
+aabc aabc aad- aabc
+aabc aaba bcd- aabc
+aab- aab- b-c- aab-
+aab- aac- b-c- aac-
+a-b- a-c- b-c- a-c-
+a-b- a-b- cdef a-b-
+a-bc a-bc defc a-bc
+abcd abcd e--- abcd
+abcb abcb d--- abcb
+abcb abcd e--- abcb
+abcb abcd e-cb abcb
+abcb abcd e-cd abcb
+abac abac d--- abac
+a-a- b-a- c--- b-a-
+a-a- b-a- c-c- b-a-
+a-a- b-a- cccc b-a-
+a-a- b-a- c-d- b-a-
+a-a- b-a- c-dd b-a-
+a-a- b-a- c-de b-a-
+a-a- b-a- ccd- b-a-
+a-a- b-a- cd-c b-a-
+a-a- b-a- cccd b-a-
+a-a- b-a- ccdc b-a-
+a-a- b-a- cdcc b-a-
+a-a- b-a- ccde b-a-
+a-a- b-a- cdcd b-a-
+a-a- b-a- cccc b-a-
+a-a- b-a- cca- b-a-
+a-a- b-a- ccb- b-a-
+a-a- b-a- c-a- b-a-
+a-a- b-a- c-b- b-a-
+a-a- b-a- c-d- b-a-
+a-a- b-a- c-d- b-a-
+a-a- b-a- cda- b-a-
+a-a- b--- a-c- b---
+a-a- b--- c-a- b---
+a-a- b--- c-a- b---
+a-b- c--- a-d- c---
+a-b- c--- d-b- c---
+a-bc d--- a-be d---
+a-bc d--- a-ec d---
+a-bc d--- e-bc d---
+a-bc d--- efg- d---
+a-bc d-e- a-bf d-e-
+a-bc d-e- a-fc d-e-

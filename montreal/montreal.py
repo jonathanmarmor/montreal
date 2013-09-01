@@ -1,25 +1,28 @@
 import sys
 import datetime
 import random
+import copy
 
-from music21.note import Note
+from music21.note import Note, Rest
 from music21.pitch import Pitch
 from music21.stream import Measure, Part, Score
 from music21.meter import TimeSignature
 from music21.metadata import Metadata
-from music21.instrument import Violin, Guitar
+from music21.instrument import Violin, AcousticGuitar
 from music21.layout import StaffGroup
 from music21.tempo import MetronomeMark
+from music21.duration import Duration
 
-from utils import frange
-import movement_1
+from utils import weighted_choice, count_intervals, frange, fill, divide, split_at_beats, join_quarters
+import harmonic_rhythm
+import form
 
 
 class Instruments(object):
     def __init__(self):
         self.names = ['vln', 'gtr']
         self.vln = vln = Violin()
-        self.gtr = gtr = Guitar()
+        self.gtr = gtr = AcousticGuitar()
         self.l = [vln, gtr]
         self.d = {}
         for name, inst in zip(self.names, self.l):
@@ -64,42 +67,124 @@ class Piece(object):
                 high = Note(inst.highest_note)
                 measure.append(high)
                 part.append(measure)
-        else:
-            # Make the piece
-            self.make_score()
-            self.make_movements()
-            # self.fix_rhythm_notation()
+            return
 
-    def make_score(self):
         score = self.score = Score()
         self.instruments = self.i = Instruments()
         self.parts = Parts(self.i)
 
+
+        # Make Metadata
         timestamp = datetime.datetime.utcnow()
-        score.insert(0, self.get_metadata(timestamp))
+        metadata = Metadata()
+        metadata.title = 'Montreal'
+        metadata.composer = 'Jonathan Marmor'
+        metadata.date = timestamp.strftime('%Y/%m/%d')
+        score.insert(0, metadata)
 
         [score.insert(0, part) for part in self.parts.l]
         score.insert(0, StaffGroup(self.parts.l))
 
         score.insert(0, MetronomeMark(number=120))
 
-        return score
-
-    def get_metadata(self, timestamp):
-        md = Metadata()
-        md.title = 'Montreal'
-        md.composer = 'Jonathan Marmor'
-        md.date = timestamp.strftime('%Y/%m/%d')
-        return md
-
-    def make_movements(self):
         # 18 to 21 minutes
         piece_duration = random.randint(2160, 2520)
-        self.movement_1 = movement_1.Movement1(piece_duration, self)
 
-    # def fix_rhythm_notation(self):
-    #     for part in self.parts.l:
-    #         part.makeBeams()
+
+        # Make the "songs"
+        songs = []
+        total = 0
+        while total < piece_duration:
+            song = Song(self)
+            songs.append(song)
+            total += song.duration
+
+        # Make notation
+        previous_duration = None
+        for song in songs:
+            for bar in song.bars:
+                for part in bar.parts:
+                    measure = Measure()
+                    if bar.duration != previous_duration:
+                        ts = TimeSignature('{}/4'.format(bar.duration))
+                        measure.timeSignature = ts
+
+                    # Fix Durations
+                    durations = [note['duration'] for note in part['notes']]
+
+                    # print
+                    # print 'durations', durations
+                    # if durations and sum(durations) not in [2, 4, 8]:
+                    #     print durations
+                    components_list = split_at_beats(durations)
+                    # print 'components_list', components_list
+                    components_list = [join_quarters(note_components) for note_components in components_list]
+                    # print 'components_list', components_list
+                    for note, components in zip(part['notes'], components_list):
+                        note['durations'] = components
+                    # print "processed durations", [note['durations'] for note in part['notes']]
+
+
+                    for note in part['notes']:
+                        if note['pitch'] == 'rest':
+                            n = Rest()
+                        else:
+                            p = Pitch(note['pitch'])
+                            # Force all flats
+                            if p.accidental.name == 'sharp':
+                                p = p.getEnharmonic()
+                            n = Note(p)
+
+                            # TODO add slurs
+                            # TODO add glissandos
+                            # TODO add -50 cent marks
+
+                        d = Duration()
+                        d.fill(note['durations'])
+                        n.duration = d
+
+                        measure.append(n)
+
+                    self.parts.d[part['instrument_name']].append(measure)
+                previous_duration = bar.duration
+
+
+class Song(object):
+    def __init__(self, piece):
+        """
+        self.duration = total song duration
+        self.bars =
+            bar.parts =
+                part['instrument_name']
+                part['notes']
+                    note['pitch']
+                    note['duration'] = total note duration
+
+
+        """
+        self.form = form.choose()
+        self.bars = self.form.bars
+
+        self.duration = self.form.duration
+
+        for name in self.form.bar_types:
+            bar_type = self.form.bar_types[name]
+            bar_type.harmonic_rhythm = harmonic_rhythm.choose(bar_type.duration)
+
+            for harm_dur in bar_type.harmonic_rhythm:
+
+                note = {
+                    'duration': harm_dur,
+                    'pitch': 60  # Placeholder
+                }
+                bar_type.parts[1]['notes'].append(note)
+
+        for bar in self.bars:
+            bar.parts = copy.deepcopy(bar.type_obj.parts)
+
+
+
+
 
 
 if __name__ == '__main__':
