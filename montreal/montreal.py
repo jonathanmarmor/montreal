@@ -23,6 +23,7 @@ from utils import split_at_beats
 from utils import join_quarters
 import harmonic_rhythm
 import form
+import chord_types
 
 
 class Instruments(object):
@@ -173,11 +174,18 @@ class Song(object):
 
             bar_type.parts[1]['notes']= [{
                 'duration': harm_dur,
-                'pitch': 60  # Placeholder
+                'pitch': self.choose_harmony()
             } for harm_dur in bar_type.harmonic_rhythm]
+
+
+
 
         for bar in self.bars:
             bar.parts = bar.type_obj.parts
+
+    def choose_harmony():
+        root = random.choice(range(12))
+        chord_type =
 
 
 

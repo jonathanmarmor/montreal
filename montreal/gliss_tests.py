@@ -15,8 +15,8 @@ from music21.layout import StaffGroup
 def test():
     stream = Stream()
 
-    n1 = Note('C4')
-    n2 = Note('D4')
+    n1 = Note('C4', duration=Duration(1.5))
+    n2 = Note('D4', duration=Duration(0.5))
     n3 = Note('E4')
     n4 = Note('F4')
     n5 = Note('G4')
@@ -27,7 +27,8 @@ def test():
     n9 = Note('E4')
     n10 = Note('F4')
     n11 = Note('G4')
-    n12 = Note('A4')
+    n12 = Note('A4', duration=Duration(0.5))
+    n13 = Note('A4', duration=Duration(0.5))
 
     gliss1 = Glissando([n2, n3])
     gliss2 = Glissando([n5, n6])
@@ -39,7 +40,7 @@ def test():
     slur3 = Slur([n9, n10])
 
 
-    stream.append([n1, n2, n3, n4, n5, n6, n7, n8, n9, n10, n11, n12])
+    stream.append([n1, n2, n3, n4, n5, n6, n7, n8, n9, n10, n11, n12, n13])
     stream.insert(0, gliss1)
     stream.insert(0, gliss2)
     stream.insert(0, gliss3)
