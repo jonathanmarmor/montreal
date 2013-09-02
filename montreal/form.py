@@ -65,6 +65,7 @@ class Bar(object):
     def __init__(self, bar_type):
         self.type = bar_type
         self.duration = 2
+        self.tempo = None
 
     def __repr__(self):
         return '{}{}'.format(self.type, self.duration)

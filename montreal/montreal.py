@@ -95,20 +95,20 @@ class Piece(object):
         [score.insert(0, part) for part in self.parts.l]
         score.insert(0, StaffGroup(self.parts.l))
 
-        tempo = 80
-        score.insert(0, MetronomeMark(number=tempo))
+
+
+
 
         # 18 to 21 minutes
         piece_duration_minutes = scale(random.random(), 0, 1, 18, 21)
-        piece_duration_beats = piece_duration_minutes * tempo
 
         # Make the "songs"
         songs = []
-        total = 0
-        while total < piece_duration_beats:
+        total_minutes = 0
+        while total_minutes < piece_duration_minutes:
             song = Song(self)
             songs.append(song)
-            total += song.duration
+            total_minutes += song.duration_minutes
 
         # Make notation
         previous_duration = None
@@ -116,6 +116,13 @@ class Piece(object):
             for bar in song.bars:
                 for part in bar.parts:
                     measure = Measure()
+                    if bar.tempo:
+                        measure.insert(0, MetronomeMark(number=bar.tempo, referent=Duration(1)))
+                        measure.leftBarline = 'double'
+
+
+
+
                     if bar.duration != previous_duration:
                         ts = TimeSignature('{}/4'.format(bar.duration))
                         measure.timeSignature = ts
@@ -181,6 +188,7 @@ class Song(object):
 
 
         """
+
         self.initial_root = random.randint(0, 11)
         self.harmony_generator = get_harmony_generator()
         # TODO choose roots
@@ -188,7 +196,10 @@ class Song(object):
         self.form = form.choose()
         self.bars = self.form.bars
 
-        self.duration = self.form.duration
+        self.duration_beats = self.form.duration
+        self.tempo = random.randint(55, 80)
+        self.bars[0].tempo = self.tempo
+        self.duration_minutes = self.duration_beats / float(self.tempo)
 
         for name in self.form.bar_types:
             bar_type = self.form.bar_types[name]
@@ -241,7 +252,7 @@ class Song(object):
         return self.build_chord(root, chord_type)
 
     def build_chord(self, root, chord_type):
-        return [p + root + 60 for p in chord_type]
+        return [p + root + 48 for p in chord_type]
 
 
 
@@ -263,7 +274,6 @@ if __name__ == '__main__':
             piece.score.show('musicxml', '/Applications/MuseScore.app')
         elif 'fin' in sys.argv:
             piece.score.show('musicxml', '/Applications/Finale 2012.app')
-
         else:
             piece.score.show('musicxml', '/Applications/Sibelius 7.app')
 
