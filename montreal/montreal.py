@@ -6,6 +6,7 @@ import random
 
 from music21.note import Note, Rest
 from music21.pitch import Pitch
+from music21.chord import Chord
 from music21.stream import Measure, Part, Score
 from music21.meter import TimeSignature
 from music21.metadata import Metadata
@@ -21,6 +22,7 @@ from utils import fill
 from utils import divide
 from utils import split_at_beats
 from utils import join_quarters
+from utils import scale
 import harmonic_rhythm
 import form
 from chord_types import get_harmony_generator
@@ -93,16 +95,17 @@ class Piece(object):
         [score.insert(0, part) for part in self.parts.l]
         score.insert(0, StaffGroup(self.parts.l))
 
-        score.insert(0, MetronomeMark(number=120))
+        tempo = 80
+        score.insert(0, MetronomeMark(number=tempo))
 
         # 18 to 21 minutes
-        piece_duration = random.randint(2160, 2520)
-
+        piece_duration_minutes = scale(random.random(), 0, 1, 18, 21)
+        piece_duration_beats = piece_duration_minutes * tempo
 
         # Make the "songs"
         songs = []
         total = 0
-        while total < piece_duration:
+        while total < piece_duration_beats:
             song = Song(self)
             songs.append(song)
             total += song.duration
@@ -129,6 +132,21 @@ class Piece(object):
                     for note in part['notes']:
                         if note['pitch'] == 'rest':
                             n = Rest()
+                        if isinstance(note['pitch'], list):
+                            pitches = []
+                            for pitch_number in note['pitch']:
+                                p = Pitch(pitch_number)
+                                # Force all flats
+                                if p.accidental.name == 'sharp':
+                                    p = p.getEnharmonic()
+                                pitches.append(p)
+                            n = Chord(notes=pitches)
+
+                            # TODO add slurs
+                            # TODO add glissandos
+                            # TODO add -50 cent marks
+
+
                         else:
                             p = Pitch(note['pitch'])
                             # Force all flats
@@ -163,7 +181,7 @@ class Song(object):
 
 
         """
-        self.root_sequence = []
+        self.initial_root = random.randint(0, 11)
         self.harmony_generator = get_harmony_generator()
         # TODO choose roots
 
@@ -188,41 +206,42 @@ class Song(object):
             bar.parts = bar.type_obj.parts
 
     def choose_root(self):
-        if not self.root_sequence:
-            self.root_sequence = [random.randint(0, 11)]
-        last = self.root_sequence[-1]
-
-        root_motion = weighted_choice([
-            7,
-            5,
-            2,
-            10,
-            0,
-            3,
-            8,
-            4,
-            7,
-            1,
-            11,
-            6
-        ], [
-            .2,
-            .2,
+        return random.randint(0, 11)
 
 
+        # if not self.root_sequence:
+        #     self.root_sequence = [random.randint(0, 11)]
+        # last = self.root_sequence[-1]
 
-        ])
-        return (last + root_motion) % 12
+        # root_motion = weighted_choice([
+        #     7,
+        #     5,
+        #     2,
+        #     10,
+        #     0,
+        #     3,
+        #     8,
+        #     4,
+        #     7,
+        #     1,
+        #     11,
+        #     6
+        # ], [
+        #     .2,
+        #     .2,
+
+
+
+        # ])
+        # return (last + root_motion) % 12
 
     def choose_harmony(self):
-        root = choose_root()
+        root = self.choose_root()
         chord_type = self.harmony_generator.next()
         return self.build_chord(root, chord_type)
 
-    def build_chord(root, chord_type):
-
-
-        return pitch_classes
+    def build_chord(self, root, chord_type):
+        return [p + root + 60 for p in chord_type]
 
 
 
@@ -240,11 +259,11 @@ if __name__ == '__main__':
         piece.score.show('midi')
 
     if 'noshow' not in sys.argv:
-        if 'sib' in sys.argv:
-            piece.score.show('musicxml', '/Applications/Sibelius 7.app')
+        if 'muse' in sys.argv:
+            piece.score.show('musicxml', '/Applications/MuseScore.app')
         elif 'fin' in sys.argv:
             piece.score.show('musicxml', '/Applications/Finale 2012.app')
 
         else:
-            piece.score.show('musicxml', '/Applications/MuseScore.app')
+            piece.score.show('musicxml', '/Applications/Sibelius 7.app')
 
