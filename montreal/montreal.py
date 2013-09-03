@@ -95,10 +95,6 @@ class Piece(object):
         [score.insert(0, part) for part in self.parts.l]
         score.insert(0, StaffGroup(self.parts.l))
 
-
-
-
-
         # 18 to 21 minutes
         piece_duration_minutes = scale(random.random(), 0, 1, 18, 21)
 
@@ -119,10 +115,6 @@ class Piece(object):
                     if bar.tempo:
                         measure.insert(0, MetronomeMark(number=bar.tempo, referent=Duration(1)))
                         measure.leftBarline = 'double'
-
-
-
-
                     if bar.duration != previous_duration:
                         ts = TimeSignature('{}/4'.format(bar.duration))
                         measure.timeSignature = ts
@@ -209,6 +201,11 @@ class Song(object):
                 'duration': harm_dur,
                 'pitch': self.choose_harmony()
             } for harm_dur in bar_type.harmonic_rhythm]
+
+            bar_type.parts[0]['notes'] = []
+
+
+
 
 
 
