@@ -148,3 +148,12 @@ def join_quarters(dur_components):
             new_dur = float(len_group)
         new_durs.append(new_dur)
     return new_durs
+
+
+def get_inversions(chord):
+    inversions = []
+    for p1 in chord:
+        inversion = [(p2 - p1) % 12 for p2 in chord]
+        inversion.sort()
+        inversions.append(tuple(inversion))
+    return inversions
