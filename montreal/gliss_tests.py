@@ -23,8 +23,8 @@ def test():
     n6 = Note('A4')
 
     n7 = Note('C4')
-    n8 = Note('D4')
-    n9 = Note('E4')
+    n8 = Note('D4').getGrace()
+    n9 = Note('E4').getGrace()
     n10 = Note('F4')
     n11 = Note('G4')
     n12 = Note('A4', duration=Duration(0.5))

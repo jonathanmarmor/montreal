@@ -1,6 +1,6 @@
 import random
 from itertools import combinations, groupby
-from collections import Counter
+from collections import Counter, defaultdict
 
 
 def scale(x, minimum, maximum, floor=0, ceiling=1):
@@ -157,3 +157,92 @@ def get_inversions(chord):
         inversion.sort()
         inversions.append(tuple(inversion))
     return inversions
+
+
+class S(object):
+    def __init__(self, *args):
+        self.weighted_options = args
+
+    def choose(self):
+        weights, options = zip(*self.weighted_options)
+        choice = weighted_choice(options, weights)
+        if isinstance(choice, S):
+            return choice.choose()
+        return choice
+
+
+def set_start_end(notes):
+    offset = 0
+    for note in notes:
+        note['start'] = offset
+        note['end'] = offset + note['duration']
+        offset += note['duration']
+
+
+def get_at(offset, notes):
+    for note in notes:
+        if note['start'] <= offset < note['end']:
+            return note
+
+
+def get_simul(lists_of_notes):
+    """
+    lists_of_notes must be a list of lists of dictionaries with duration and pitch attributes
+    """
+    for part in lists_of_notes:
+        offset = 0
+        for note in part:
+            note['start'] = offset
+            note['end'] = offset + note['duration']
+            offset += note['duration']
+
+    beat_map = defaultdict(list)
+    duration = sum([note['duration'] for note in lists_of_notes[0]])
+    for offset in frange(0, duration, .25):
+        for part in lists_of_notes:
+            for note in part:
+                if note['start'] <= offset < note['end']:
+                    beat_map[offset].append(note)
+
+    simuls = []
+    for beat in frange(0, duration, .25):
+        simul = []
+        for note in beat_map[beat]:
+            pitch = note['pitch']
+            if not isinstance(pitch, list):
+                pitch = [pitch]
+            for p in pitch:
+                if p not in simul:
+                    simul.append(p)
+        simuls.append(simul)
+    return simuls
+
+
+
+
+
+
+    beat_map = defaultdict(list)
+    for part in lists_of_notes:
+        beat = 0
+        for note in part:
+            dur = note['duration']
+            for b in frange(0, dur, .25):
+                if note['pitch'] != 'rest':
+                    beat_map[beat].append(note)
+                beat += .25
+
+    print beat_map
+
+    simuls = []
+    for beat in beat_map:
+        simul = []
+        for note in beat_map[beat]:
+            pitch = note['pitch']
+            if not isinstance(pitch, list):
+                pitch = [pitch]
+            for p in pitch:
+                if p not in simul:
+                    simul.append(p)
+        simuls.append(simul)
+    return simuls
