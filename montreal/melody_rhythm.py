@@ -3,7 +3,7 @@ from utils import S
 
 rhythm_options = {}
 rhythm_options[1] = S(
-    (20, [1]),
+    (15, [1]),
     (25, [.5, .5]),
     (20, [.25, .75]),
     (28, [.75, .25]),
@@ -14,7 +14,7 @@ rhythm_options[1] = S(
 )
 rhythm_options[2] = S(
     (20, rhythm_options[1].choose() + rhythm_options[1].choose()),
-    (15, [2]),
+    (3, [2]),
     (5, [.25, 1.75]),
     (15, [.5, 1.5]),
     (15, [1.5, .5]),
@@ -26,23 +26,23 @@ rhythm_options[2] = S(
 )
 rhythm_options[4] = S(
     (30, rhythm_options[2].choose() + rhythm_options[2].choose()),
-    (30, [4]),
+    (6, [4]),
     (6, [.25, 3.75]),
-    (10, [.5, 3.5]),
+    (6, [.5, 3.5]),
     (20, rhythm_options[1].choose() + [3]),
     (3, [1.5, 2.5]),
     (3, [2.5, 1.5]),
-    (20, [3] + rhythm_options[1].choose()),
-    (15, [3.5, .5]),
-    (20, [3.75, .25]),
-    (14, [.25, .25, 3.5]),
-    (10, [.5, .5, 3]),
+    (5, [3] + rhythm_options[1].choose()),
+    (5, [3.5, .5]),
+    (5, [3.75, .25]),
+    (6, [.25, .25, 3.5]),
+    (6, [.5, .5, 3]),
     (3, [1.5, 1.5, 1]),
     (10, [1, 1.5, 1.5]),
-    (10, [3, .5, .5]),
-    (20, [3.5, .25, .25]),
-    (17, [.25, .25, .25, 3.25]),
-    (17, [3.25, .25, .25, .25]),
+    (6, [3, .5, .5]),
+    (5, [3.5, .25, .25]),
+    (6, [.25, .25, .25, 3.25]),
+    (6, [3.25, .25, .25, .25]),
     (3, [.25, .25, .5, 3]),
     (3, [.5, .25, .25, 3]),
     (13, [.25, .25, 1, 2.5]),
@@ -57,12 +57,12 @@ rhythm_options[4] = S(
     (7, [.75, .75, .75, .75, 1]),
 )
 rhythm_options[8] = S(
-    (30, rhythm_options[4].choose() + rhythm_options[4].choose()),
-    (10, [8]),
-    (3, [7] + rhythm_options[1].choose()),
-    (3, rhythm_options[1].choose() + [7]),
-    (6, [6] + rhythm_options[2].choose()),
-    (6, rhythm_options[2].choose() + [6]),
+    (50, rhythm_options[4].choose() + rhythm_options[4].choose()),
+    (1, [8]),
+    (1, [7] + rhythm_options[1].choose()),
+    (1, rhythm_options[1].choose() + [7]),
+    (1, [6] + rhythm_options[2].choose()),
+    (1, rhythm_options[2].choose() + [6]),
 )
 
 

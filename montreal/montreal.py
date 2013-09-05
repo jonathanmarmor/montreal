@@ -3,7 +3,7 @@
 import sys
 import datetime
 import random
-from collections import defaultdict
+from collections import defaultdict, Counter
 
 from music21.note import Note, Rest
 from music21.pitch import Pitch
@@ -80,7 +80,7 @@ class Piece(object):
         # Make Metadata
         timestamp = datetime.datetime.utcnow()
         metadata = Metadata()
-        metadata.title = 'Montreal'
+        metadata.title = 'Early Montreal'
         metadata.composer = 'Jonathan Marmor'
         metadata.date = timestamp.strftime('%Y/%m/%d')
         score.insert(0, metadata)
@@ -167,7 +167,11 @@ class Piece(object):
                             # TODO add -50 cent marks
 
                         d = Duration()
-                        d.fill(note['durations'])
+                        if note['duration'] == 0:
+                            d.quarterLength = .5
+                            d = d.getGraceDuration()
+                        else:
+                            d.fill(note['durations'])
                         n.duration = d
 
                         measure.append(n)
@@ -190,9 +194,12 @@ class Song(object):
 
         """
         self.piece = piece
-        self.initial_root = random.randint(0, 11)
+        self.prev_root = random.randint(0, 11)
         self.harmony_generator = get_harmony_generator()
         # TODO choose roots
+
+        self.vln_all_notes = self.piece.instruments.vln.all_notes
+        self.vln_register = self.choose_violin_register()
 
         self.form = form.choose()
         self.bars = self.form.bars
@@ -219,29 +226,23 @@ class Song(object):
     def choose_root(self):
         return random.randint(0, 11)
 
-        # if not self.root_sequence:
-        #     self.root_sequence = [random.randint(0, 11)]
-        # last = self.root_sequence[-1]
-
-        # root_motion = weighted_choice([
-        #     7,
-        #     5,
-        #     2,
-        #     10,
-        #     0,
-        #     3,
-        #     8,
-        #     4,
-        #     7,
-        #     1,
-        #     11,
-        #     6
-        # ], [
-        #     .2,
-        #     .2,
-
-        # ])
-        # return (last + root_motion) % 12
+        root_motion = weighted_choice([
+            7,
+            5,
+            2,
+            10,
+            3,
+            8,
+            4,
+            9,
+            1,
+            11,
+            0,
+            6
+        ], range(24, 12, -1))
+        root = (self.prev_root + root_motion) % 12
+        self.prev_root = root
+        return root
 
     def choose_harmony(self):
         root = self.choose_root()
@@ -252,22 +253,20 @@ class Song(object):
         return [p + root + 48 for p in chord_type]
 
     def choose_violin_register(self):
-        all_notes = self.piece.instruments.vln.all_notes
-        octave = weighted_choice([0, 1], [.6, .4]) * 12
-        lowest = octave + random.randint(0, 12)
-        width = random.randint(13, 17)
+        lowest = random.randint(0, 18)
+        width = random.randint(13, 22)
         highest = lowest + width
-        return all_notes[lowest:highest]
+        return self.vln_all_notes[lowest:highest]
 
     def choose_melody_notes(self, duration, harmonies):
         # return a list of {pitch, duration} dicts
         notes = []
 
         # choose a register
-        register = self.choose_violin_register()
-        register_by_pitch_classes = defaultdict(list)
-        for p in register:
-            register_by_pitch_classes[p % 12].append(p)
+        # register = self.choose_violin_register()
+        # register_by_pitch_classes = defaultdict(list)
+        # for p in register:
+        #     register_by_pitch_classes[p % 12].append(p)
 
         rhythm = get_melody_rhythm(duration)
 
@@ -277,92 +276,184 @@ class Song(object):
                 'duration': r
             })
 
-        self.choose_melody_pitches(notes, register, harmonies)
+        self.choose_melody_pitches(notes, self.vln_register, harmonies)
+
+        notes = self.add_ornaments(notes)
 
         return notes
 
 
+    def get_pitch_options(self, note_harmonies, prev):
+        pitch_options = [prev - 2, prev - 1, prev + 1, prev + 2]
+        pitch_options = [p for p in pitch_options if p % 12 in note_harmonies and p in self.vln_all_notes]
+        if len(pitch_options) == 0:
+            if prev % 12 in note_harmonies and random.random() < .12:
+                pitch_options = [prev]
+            else:
+                pitch_options = [prev - 5, prev - 4, prev - 3, prev + 3, prev + 4, prev + 5]
+                pitch_options = [p for p in pitch_options if p % 12 in note_harmonies and p in self.vln_all_notes]
+            # if len(pitch_options) == 0:
+            #     pitch_options = [prev - 8, prev - 7, prev - 6, prev + 6, prev + 7, prev + 8]
+            #     pitch_options = [p for p in pitch_options if p % 12 in note_harmonies]
+        return pitch_options
+
     def choose_melody_pitches(self, notes, register, harmonies):
         print 'Choosing pitches'
         for h in harmonies:
-            h['pitch'] = [p % 12for p in h['pitch']]
+            h['pitch_classes'] = [p % 12 for p in h['pitch']]
 
         set_start_end(notes)
         set_start_end(harmonies)
 
-        previous_note_index = random.choice(range(len(register)))
+        previous_note_index = random.choice(range(int(len(register) * .4)))
+        prev = register[previous_note_index]
 
         for note in notes:
+            beats = list(frange(note['start'], note['start'] + note['duration'], .25))
             note_harmonies = []
-            for b in frange(note['start'], note['duration'], .25):
+            for b in beats:
                 h = get_at(b, harmonies)
-                h = h['pitch']
+                h = h['pitch_classes']
                 if h not in note_harmonies:
                     note_harmonies.append(h)
 
-            for width in range(1, 6):
-                lowest = previous_note_index - width
-                if lowest < 0:
-                    lowest = 0
-                highest = previous_note_index + width
-                temp_register = register[lowest:highest + 1]
-                pitch_options = [p for p in temp_register if p in note_harmonies]
-                width += 1
-                if len(pitch_options) > 0:
-                    break
+            print 'note_harmonies', note_harmonies
+
+            if len(note_harmonies) == 1:
+                pitch_options = self.get_pitch_options(note_harmonies[0], prev)
+            else:
+                pitch_options = []
+
+                c = Counter()
+                for h in note_harmonies:
+                    for p in h:
+                        c[p] += 1
+
+                common = []
+                for p, count in c.most_common():
+                    if count == len(note_harmonies):
+                        common.append(p)
+
+                if len(common) > 0:
+                    pitch_options = self.get_pitch_options(common, prev)
+
+                if len(pitch_options) == 0:
+                    ranked = [p for p, _ in c.most_common() if p not in common]
+
+                    for p in ranked:
+                        pitch_options = self.get_pitch_options([p], prev)
+                        if len(pitch_options) > 0:
+                            break
 
             if len(pitch_options) == 0:
-                lowest = previous_note_index - 2
-                if lowest < 0:
-                    lowest = 0
-                highest = previous_note_index + 2
-                temp_register = register[lowest:highest + 1]
-                pitch_options = [p for p in temp_register]
+                pitch_options = [prev - 2, prev - 1, prev + 1, prev + 2]
 
             note['pitch'] = random.choice(pitch_options)
 
+            print note['pitch'] % 12
+            print
+
+            prev = note['pitch']
+
+            self.add_ornament(note, prev, note_harmonies)
+
+    def add_ornament(self, note, prev, harmonies):
+        if note['duration'] < .75 or random.random() < .3:
+            return
+
+        harmonies = [p for p in [h for h in harmonies]]
+
+        interval = note['pitch'] - prev
+        if interval > 0:
+            direction = 'ascending'
+        if interval < 0:
+            direction = 'descending'
+        if interval == 0:
+            direction = random.choice(['ascending', 'descending'])
+
+        np = int(note['pitch'])
+
+        # below = [p for p in range(np - 4,  np) if p % 12 in harmonies]
+        # above = [p for p in range(np + 1,  np + 5) if p % 12 in harmonies]
+
+        orn_types = {}
+        orn_types['ascending'] = [
+            [np - 1],
+            [np - 2],
+            [np - 1],
+            [np - 2],
+            [np - 1],
+            [np - 2],
+            [np - 1],
+            [np - 2],
+            [np - 2, np - 1],
+            [np - 3, np - 1],
+            [np - 3, np - 2],
+            [np - 4, np - 2],
+            [np, np - 1],
+            [np, np - 2],
+            [np - 1, np - 2],
+            [np - 1, np - 3],
+            [np - 2, np - 3],
+            [np - 2, np - 4],
+
+            [np - 1, np + 1],
+            [np - 1, np + 2],
+            [np - 2, np + 1],
+            [np - 2, np + 2],
+            [np + 1, np - 1],
+            [np + 1, np - 2],
+            [np + 2, np - 1],
+            [np + 2, np - 2]
+        ]
+        orn_types['descending'] = [
+            [np + 1],
+            [np + 2],
+            [np + 1],
+            [np + 2],
+            [np + 1],
+            [np + 2],
+            [np + 1],
+            [np + 2],
+            [np + 2, np + 1],
+            [np + 3, np + 1],
+            [np + 3, np + 2],
+            [np + 4, np + 2],
+            [np, np + 1],
+            [np, np + 2],
+            [np + 1, np + 2],
+            [np + 1, np + 3],
+            [np + 2, np + 3],
+            [np + 2, np + 4],
+
+            [np - 1, np + 1],
+            [np - 1, np + 2],
+            [np - 2, np + 1],
+            [np - 2, np + 2],
+            [np + 1, np - 1],
+            [np + 1, np - 2],
+            [np + 2, np - 1],
+            [np + 2, np - 2]
+        ]
+
+        orn_type = random.choice(orn_types[direction])
 
 
+        note['ornaments'] = []
+        for n in orn_type:
+            note['ornaments'].append({
+                'pitch': n,
+                'duration': 0
+            })
 
-        # simul = get_simul([notes, harmonies])
-
-
-
-
-
-
-
-
-        # REMEMBER
-        # 1. voice leading (chromatic, diatonic, pentatonic)
-        # 2. harmonies (chord tones, diatonic)
-
-
-        # offset = 0
-        # for harm in harmonies:
-        #     harm_dur = harm['duration']
-        #     chord_pcs = [h % 12 for h in harm['pitch']]
-
-        #     target_pc = random.choice(chord_pcs)
-        #     target = random.choice(register_by_pitch_classes[target_pc])
-
-
-        #     rhythm = get_melody_rhythm(harm_dur)
-
-        #     for r in rhythm:
-        #         notes.append({
-        #             'pitch': target,  # TODO change
-        #             'duration': r
-        #         })
-
-        #     offset += harm_dur
-
-
-
-
-
-
-
+    def add_ornaments(self, notes):
+        new_notes = []
+        for note in notes:
+            if note.get('ornaments'):
+                for orn in note['ornaments']:
+                    new_notes.append(orn)
+            new_notes.append(note)
+        return new_notes
 
 
 
