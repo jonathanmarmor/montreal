@@ -272,12 +272,11 @@ class Song(object):
         self.bars = self.form.bars
 
         self.duration_beats = self.form.duration
-        self.tempo = random.randint(55, 80)
+        self.tempo = random.randint(40, 50)
         self.bars[0].tempo = self.tempo
         self.duration_minutes = self.duration_beats / float(self.tempo)
 
         for name in self.form.bar_types:
-            print name
             bar_type = self.form.bar_types[name]
             bar_type.harmonic_rhythm = harmonic_rhythm.choose(bar_type.duration)
 
@@ -287,23 +286,15 @@ class Song(object):
 
 
 
-
+            # Vibraphone
             vibraphone = get_by_attr(bar_type.parts, 'instrument_name', 'vib')
-
             vibraphone['notes'] = [{
                 'duration': harm_dur,
                 'pitch': self.choose_harmony()
             } for harm_dur in bar_type.harmonic_rhythm]
 
-            # bar_type.parts[1]['notes']= [{
-            #     'duration': harm_dur,
-            #     'pitch': self.choose_harmony()
-            # } for harm_dur in bar_type.harmonic_rhythm]
-
-            # bar_type.parts[0]['notes'] = self.choose_melody_notes(bar_type.duration, bar_type.parts[1]['notes'])
-
+            # Violin
             violin = get_by_attr(bar_type.parts, 'instrument_name', 'vln')
-
             violin['notes'] = self.choose_melody_notes(bar_type.duration, vibraphone['notes'])
 
         for bar in self.bars:
