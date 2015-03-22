@@ -475,5 +475,5 @@ if __name__ == '__main__':
         elif 'fin' in sys.argv:
             piece.score.show('musicxml', '/Applications/Finale 2012.app')
         else:
-            piece.score.show('musicxml', '/Applications/Sibelius 7.app')
+            piece.score.show('musicxml', '/Applications/Sibelius 7.5.app')
 
