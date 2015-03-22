@@ -254,3 +254,8 @@ def midi_note_number_to_scientific_name(number):
     octave = octave - 1
     name = names[name_index]
     return '{}{}'.format(name, octave)
+
+
+def get_by_attr(items, key, value):
+    return next((item for item in items if item.get(key) == value), None)
+

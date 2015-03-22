@@ -38,6 +38,7 @@ from utils import S
 from utils import get_simul
 from utils import set_start_end
 from utils import get_at
+from utils import get_by_attr
 import harmonic_rhythm
 import form
 from chord_types import get_harmony_generator
@@ -295,7 +296,7 @@ class Song(object):
 
 
 
-            vibraphone = get_by_attr(bar_type.parts, 'vib')
+            vibraphone = get_by_attr(bar_type.parts, 'instrument_name', 'vib')
 
             vibraphone['notes'] = [{
                 'duration': harm_dur,
@@ -309,7 +310,7 @@ class Song(object):
 
             # bar_type.parts[0]['notes'] = self.choose_melody_notes(bar_type.duration, bar_type.parts[1]['notes'])
 
-            violin = get_by_attr(bar_type.parts, 'violin')
+            violin = get_by_attr(bar_type.parts, 'instrument_name', 'vln')
 
             violin['notes'] = self.choose_melody_notes(bar_type.duration, vibraphone['notes'])
 
