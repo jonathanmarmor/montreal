@@ -154,7 +154,7 @@ class Piece(object):
         # Make Metadata
         timestamp = datetime.datetime.utcnow()
         metadata = Metadata()
-        metadata.title = 'Early Montreal'
+        metadata.title = 'Utah'
         metadata.composer = 'Jonathan Marmor'
         metadata.date = timestamp.strftime('%Y/%m/%d')
         score.insert(0, metadata)
@@ -175,8 +175,8 @@ class Piece(object):
             return
 
 
-        # 18 to 21 minutes
-        piece_duration_minutes = scale(random.random(), 0, 1, 18, 21)
+        # 8 to 12 minutes
+        piece_duration_minutes = scale(random.random(), 0, 1, 8, 12)
 
         # Make the "songs"
         songs = []
@@ -284,15 +284,34 @@ class Song(object):
         self.duration_minutes = self.duration_beats / float(self.tempo)
 
         for name in self.form.bar_types:
+            print name
             bar_type = self.form.bar_types[name]
             bar_type.harmonic_rhythm = harmonic_rhythm.choose(bar_type.duration)
 
-            bar_type.parts[1]['notes']= [{
+
+
+
+
+
+
+
+            vibraphone = get_by_attr(bar_type.parts, 'vib')
+
+            vibraphone['notes'] = [{
                 'duration': harm_dur,
                 'pitch': self.choose_harmony()
             } for harm_dur in bar_type.harmonic_rhythm]
 
-            bar_type.parts[0]['notes'] = self.choose_melody_notes(bar_type.duration, bar_type.parts[1]['notes'])
+            # bar_type.parts[1]['notes']= [{
+            #     'duration': harm_dur,
+            #     'pitch': self.choose_harmony()
+            # } for harm_dur in bar_type.harmonic_rhythm]
+
+            # bar_type.parts[0]['notes'] = self.choose_melody_notes(bar_type.duration, bar_type.parts[1]['notes'])
+
+            violin = get_by_attr(bar_type.parts, 'violin')
+
+            violin['notes'] = self.choose_melody_notes(bar_type.duration, vibraphone['notes'])
 
         for bar in self.bars:
             bar.parts = bar.type_obj.parts
@@ -372,7 +391,7 @@ class Song(object):
         return pitch_options
 
     def choose_melody_pitches(self, notes, register, harmonies):
-        print 'Choosing pitches'
+        # print 'Choosing pitches'
         for h in harmonies:
             h['pitch_classes'] = [p % 12 for p in h['pitch']]
 
@@ -391,7 +410,7 @@ class Song(object):
                 if h not in note_harmonies:
                     note_harmonies.append(h)
 
-            print 'note_harmonies', note_harmonies
+            # print 'note_harmonies', note_harmonies
 
             if len(note_harmonies) == 1:
                 pitch_options = self.get_pitch_options(note_harmonies[0], prev)
@@ -424,8 +443,8 @@ class Song(object):
 
             note['pitch'] = random.choice(pitch_options)
 
-            print note['pitch'] % 12
-            print
+            # print note['pitch'] % 12
+            # print
 
             prev = note['pitch']
 

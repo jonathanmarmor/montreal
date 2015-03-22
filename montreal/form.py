@@ -1,40 +1,5 @@
 import random
 
-"""
-Ignore this
-options = [
-    ['a---'],
-    [
-        'a-a-',
-        'a-b-'
-    ],
-    [
-        'aab-',
-        'a-bb',
-        'a-bc',
-        'abc-',
-        'ab-a',
-        'ab-c'
-    ],
-    [
-        'abac',
-        'abcb',
-        'aaba',
-        'abaa',
-        'abab',
-        'aabb',
-        'aaab',
-        'abbb',
-        'aaaa',
-        'aabc',
-        'abca',
-        'abba',
-        'abbc',
-        'abcc',
-        'abcd'
-    ]
-]
-"""
 
 class Form(object):
     def __init__(self, form_string):
@@ -76,18 +41,18 @@ class BarType(object):
         self.name = name
         self.duration = duration
 
-        self.parts = [
-            {
-                'instrument_name': 'vln',
-                'notes': []
-            },
-            {
-                'instrument_name': 'gtr',
-                'notes': []
-            }
+        names = [
+            'ob',
+            'cl',
+            'fl',
+            'sax',
+            'tpt',
+            'vln',
+            'gtr',
+            'vib',
+            'bs'
         ]
-
-
+        self.parts = [{'instrument_name': n, 'notes': []} for n in names]
 
 
 def parse_file():
