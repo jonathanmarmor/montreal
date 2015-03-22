@@ -48,7 +48,6 @@ class BarType(object):
             'sax',
             'tpt',
             'vln',
-            'gtr',
             'vib',
             'bs'
         ]

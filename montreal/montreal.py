@@ -18,7 +18,6 @@ from music21.instrument import (
     AltoSaxophone,
     Trumpet,
     Violin,
-    AcousticGuitar,
     Vibraphone,
     Contrabass
 )
@@ -54,7 +53,6 @@ class Instruments(object):
             'sax',
             'tpt',
             'vln',
-            'gtr',
             'vib',
             'bs'
         ]
@@ -64,7 +62,6 @@ class Instruments(object):
         self.sax = sax = AltoSaxophone()
         self.tpt = tpt = Trumpet()
         self.vln = vln = Violin()
-        self.gtr = gtr = AcousticGuitar()
         self.vib = vib = Vibraphone()
         self.bs = bs = Contrabass()
 
@@ -75,7 +72,6 @@ class Instruments(object):
             sax,
             tpt,
             vln,
-            gtr,
             vib,
             bs
         ]
@@ -92,7 +88,6 @@ class Instruments(object):
             ('D-3', 'A-5'),  # Sax
             ('E3', 'B-5'),  # Trumpet
             ('G3', 'B6'),  # Violin
-            ('E2', 'G5'),  # Guitar
             ('F3', 'F6'),  # Vibraphone
             ('E1', 'G3')  # Bass
         ]
@@ -112,7 +107,6 @@ class Parts(object):
             'sax',
             'tpt',
             'vln',
-            'gtr',
             'vib',
             'bs'
         ]
@@ -123,7 +117,6 @@ class Parts(object):
         self.sax = sax = Part()
         self.tpt = tpt = Part()
         self.vln = vln = Part()
-        self.gtr = gtr = Part()
         self.vib = vib = Part()
         self.bs = bs = Part()
 
@@ -134,7 +127,6 @@ class Parts(object):
             sax,
             tpt,
             vln,
-            gtr,
             vib,
             bs
         ]
