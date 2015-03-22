@@ -11,7 +11,17 @@ from music21.chord import Chord
 from music21.stream import Measure, Part, Score
 from music21.meter import TimeSignature
 from music21.metadata import Metadata
-from music21.instrument import Violin, AcousticGuitar
+from music21.instrument import (
+    Oboe,
+    Clarinet,
+    Flute,
+    AltoSaxophone,
+    Trumpet,
+    Violin,
+    AcousticGuitar,
+    Vibraphone,
+    Contrabass
+)
 from music21.layout import StaffGroup
 from music21.tempo import MetronomeMark
 from music21.duration import Duration
@@ -36,10 +46,38 @@ from melody_rhythm import get_melody_rhythm
 
 class Instruments(object):
     def __init__(self):
-        self.names = ['vln', 'gtr']
+        self.names = [
+            'ob',
+            'cl',
+            'fl',
+            'sax',
+            'tpt',
+            'vln',
+            'gtr',
+            'vib',
+            'bs'
+        ]
+        self.ob = ob = Oboe()
+        self.cl = cl = Clarinet()
+        self.fl = fl = Flute()
+        self.sax = sax = AltoSaxophone()
+        self.tpt = tpt = Trumpet()
         self.vln = vln = Violin()
         self.gtr = gtr = AcousticGuitar()
-        self.l = [vln, gtr]
+        self.vib = vib = Vibraphone()
+        self.bs = bs = Contrabass()
+
+        self.l = [
+            ob,
+            cl,
+            fl,
+            sax,
+            tpt,
+            vln,
+            gtr,
+            vib,
+            bs
+        ]
         self.d = {}
         for name, inst in zip(self.names, self.l):
             inst.nickname = name
@@ -47,8 +85,15 @@ class Instruments(object):
 
         # lowest, highest notes
         ranges = [
+            ('B-3', 'G#6'),  # Oboe
+            ('D3', 'G6'),  # Clarinet
+            ('C4', 'C7'),  # Flute
+            ('D-3', 'A-5'),  # Sax
+            ('E3', 'B-5'),  # Trumpet
             ('G3', 'B6'),  # Violin
-            ('E2', 'G5')  # Guitar
+            ('E2', 'G5'),  # Guitar
+            ('F3', 'F6'),  # Vibraphone
+            ('E1', 'G3')  # Bass
         ]
         for r, i in zip(ranges, self.l):
             i.lowest_note = Pitch(r[0])
@@ -59,10 +104,39 @@ class Instruments(object):
 
 class Parts(object):
     def __init__(self, instruments):
-        self.names = ['vln', 'gtr']
+        self.names = [
+            'ob',
+            'cl',
+            'fl',
+            'sax',
+            'tpt',
+            'vln',
+            'gtr',
+            'vib',
+            'bs'
+        ]
+
+        self.ob = ob = Part()
+        self.cl = cl = Part()
+        self.fl = fl = Part()
+        self.sax = sax = Part()
+        self.tpt = tpt = Part()
         self.vln = vln = Part()
         self.gtr = gtr = Part()
-        self.l = [vln, gtr]
+        self.vib = vib = Part()
+        self.bs = bs = Part()
+
+        self.l = [
+            ob,
+            cl,
+            fl,
+            sax,
+            tpt,
+            vln,
+            gtr,
+            vib,
+            bs
+        ]
         self.d = {}
         for name, part, inst in zip(self.names, self.l, instruments.l):
             part.id = name

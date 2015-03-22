@@ -246,3 +246,11 @@ def get_simul(lists_of_notes):
                     simul.append(p)
         simuls.append(simul)
     return simuls
+
+
+def midi_note_number_to_scientific_name(number):
+    names = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
+    octave, name_index = divmod(number, 12)
+    octave = octave - 1
+    name = names[name_index]
+    return '{}{}'.format(name, octave)
