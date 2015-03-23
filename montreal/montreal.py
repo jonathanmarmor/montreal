@@ -382,7 +382,10 @@ class Song(object):
         previous_note_index = random.choice(range(int(len(register) * .4)))
         prev = register[previous_note_index]
 
+        previous_note = {'duration': 1.0, 'pitch': prev}
+
         for note in notes:
+            print 'NOTE:', note
             beats = list(frange(note['start'], note['start'] + note['duration'], .25))
             note_harmonies = []
             for b in beats:
@@ -427,17 +430,21 @@ class Song(object):
             # print note['pitch'] % 12
             # print
 
-            prev = note['pitch']
+            self.add_ornament(note, previous_note, note_harmonies)
 
-            self.add_ornament(note, prev, note_harmonies)
+            prev = note['pitch']
+            previous_note = note
+
 
     def add_ornament(self, note, prev, harmonies):
         if note['duration'] < .75 or random.random() < .3:
             return
 
-        harmonies = [p for p in [h for h in harmonies]]
+        print prev, note, harmonies
 
-        interval = note['pitch'] - prev
+        # harmonies = [p for p in [h for h in harmonies]]
+
+        interval = note['pitch'] - prev['pitch']
         if interval > 0:
             direction = 'ascending'
         if interval < 0:
