@@ -390,6 +390,8 @@ class Song(object):
         print 'harmonies:', harmonies
         print
 
+        pitch_history = []
+
         for note in notes:
             print
             print 'NOTE:', note
@@ -444,6 +446,7 @@ class Song(object):
 
             prev = note['pitch']
             previous_note = note
+            pitch_history.append(note['pitch'])
 
 
     def add_ornament(self, note, prev, harmonies):
