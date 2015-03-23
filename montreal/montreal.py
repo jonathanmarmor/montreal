@@ -177,20 +177,21 @@ class Piece(object):
         total_minutes = 0
         n = 1
         while total_minutes < piece_duration_minutes:
+            print '=/' * 50
             print 'Song', n
             n += 1
             song = Song(self)
             songs.append(song)
-            print 'Song Duration:', int(round(song.duration_minutes * 60.0))
-            print 'Tempo:', song.tempo
-            print 'Number of Beats:', song.duration_beats
-            print
+            # print 'Song Duration:', int(round(song.duration_minutes * 60.0))
+            # print 'Tempo:', song.tempo
+            # print 'Number of Beats:', song.duration_beats
+            # print
             total_minutes += song.duration_minutes
 
         _minutes, _seconds = divmod(total_minutes, 1.0)
-        print
-        print 'Total Duration: {}:{}'.format(int(_minutes), int(round(_seconds * 60)))
-        print
+        # print
+        # print 'Total Duration: {}:{}'.format(int(_minutes), int(round(_seconds * 60)))
+        # print
 
         # Make notation
         previous_duration = None
@@ -384,15 +385,24 @@ class Song(object):
 
         previous_note = {'duration': 1.0, 'pitch': prev}
 
+        print
+        print '*'*80
+        print 'harmonies:', harmonies
+        print
+
         for note in notes:
+            print
             print 'NOTE:', note
             beats = list(frange(note['start'], note['start'] + note['duration'], .25))
             note_harmonies = []
             for b in beats:
+                print b
                 h = get_at(b, harmonies)
                 h = h['pitch_classes']
+                print h
                 if h not in note_harmonies:
                     note_harmonies.append(h)
+            print 'note_harmonies', note_harmonies
 
             # print 'note_harmonies', note_harmonies
 
@@ -437,10 +447,10 @@ class Song(object):
 
 
     def add_ornament(self, note, prev, harmonies):
-        if note['duration'] < .75 or random.random() < .3:
+        if (prev['duration'] <= .25 and random.random() < .4) or random.random() < .08:
             return
 
-        print prev, note, harmonies
+        # print prev, note, harmonies
 
         # harmonies = [p for p in [h for h in harmonies]]
 
