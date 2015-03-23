@@ -47,18 +47,18 @@ from melody_rhythm import get_melody_rhythm
 class Instruments(object):
     def __init__(self):
         self.names = [
+            'fl',
             'ob',
             'cl',
-            'fl',
             'sax',
             'tpt',
             'vln',
             'vib',
             'bs'
         ]
+        self.fl = fl = Flute()
         self.ob = ob = Oboe()
         self.cl = cl = Clarinet()
-        self.fl = fl = Flute()
         self.sax = sax = AltoSaxophone()
         self.tpt = tpt = Trumpet()
         self.vln = vln = Violin()
@@ -66,9 +66,9 @@ class Instruments(object):
         self.bs = bs = Contrabass()
 
         self.l = [
+            fl,
             ob,
             cl,
-            fl,
             sax,
             tpt,
             vln,
@@ -82,9 +82,9 @@ class Instruments(object):
 
         # lowest, highest notes
         ranges = [
+            ('C4', 'C7'),  # Flute
             ('B-3', 'G#6'),  # Oboe
             ('D3', 'G6'),  # Clarinet
-            ('C4', 'C7'),  # Flute
             ('D-3', 'A-5'),  # Sax
             ('E3', 'B-5'),  # Trumpet
             ('G3', 'B6'),  # Violin
@@ -101,9 +101,9 @@ class Instruments(object):
 class Parts(object):
     def __init__(self, instruments):
         self.names = [
+            'fl',
             'ob',
             'cl',
-            'fl',
             'sax',
             'tpt',
             'vln',
@@ -111,9 +111,9 @@ class Parts(object):
             'bs'
         ]
 
+        self.fl = fl = Part()
         self.ob = ob = Part()
         self.cl = cl = Part()
-        self.fl = fl = Part()
         self.sax = sax = Part()
         self.tpt = tpt = Part()
         self.vln = vln = Part()
@@ -121,9 +121,9 @@ class Parts(object):
         self.bs = bs = Part()
 
         self.l = [
+            fl,
             ob,
             cl,
-            fl,
             sax,
             tpt,
             vln,
@@ -280,12 +280,6 @@ class Song(object):
             bar_type = self.form.bar_types[name]
             bar_type.harmonic_rhythm = harmonic_rhythm.choose(bar_type.duration)
 
-
-
-
-
-
-
             # Vibraphone
             vibraphone = get_by_attr(bar_type.parts, 'instrument_name', 'vib')
             vibraphone['notes'] = [{
@@ -382,6 +376,7 @@ class Song(object):
         set_start_end(notes)
         set_start_end(harmonies)
 
+        # Pick a random pitch from the instrument's register on which to start
         previous_note_index = random.choice(range(int(len(register) * .4)))
         prev = register[previous_note_index]
 
@@ -533,8 +528,6 @@ class Song(object):
         return new_notes
 
 
-
-
 if __name__ == '__main__':
     print 'STARTING!!!', '*' * 40
     show = True
@@ -553,4 +546,3 @@ if __name__ == '__main__':
             piece.score.show('musicxml', '/Applications/Finale 2012.app')
         else:
             piece.score.show('musicxml', '/Applications/Sibelius 7.5.app')
-

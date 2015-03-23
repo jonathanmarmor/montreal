@@ -42,9 +42,9 @@ class BarType(object):
         self.duration = duration
 
         names = [
+            'fl',
             'ob',
             'cl',
-            'fl',
             'sax',
             'tpt',
             'vln',
@@ -52,6 +52,9 @@ class BarType(object):
             'bs'
         ]
         self.parts = [{'instrument_name': n, 'notes': []} for n in names]
+
+    def __repr__(self):
+        return 'Bar Type: name: {} duration: {} parts: '.format(self.name, self.duration, self.parts)
 
 
 def parse_file():
