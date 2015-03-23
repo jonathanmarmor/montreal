@@ -169,18 +169,28 @@ class Piece(object):
 
 
         # 8 to 12 minutes
-        piece_duration_minutes = scale(random.random(), 0, 1, 8, 12)
+        max_duration = 12 - .75
+        piece_duration_minutes = scale(random.random(), 0, 1, 8, max_duration)
 
         # Make the "songs"
         songs = []
         total_minutes = 0
         n = 1
         while total_minutes < piece_duration_minutes:
-            print 'Song {}'.format(n)
+            print 'Song', n
             n += 1
             song = Song(self)
             songs.append(song)
+            print 'Song Duration:', int(round(song.duration_minutes * 60.0))
+            print 'Tempo:', song.tempo
+            print 'Number of Beats:', song.duration_beats
+            print
             total_minutes += song.duration_minutes
+
+        _minutes, _seconds = divmod(total_minutes, 1.0)
+        print
+        print 'Total Duration: {}:{}'.format(int(_minutes), int(round(_seconds * 60)))
+        print
 
         # Make notation
         previous_duration = None
@@ -217,11 +227,6 @@ class Piece(object):
                                 pitches.append(p)
                             n = Chord(notes=pitches)
 
-                            # TODO add slurs
-                            # TODO add glissandos
-                            # TODO add -50 cent marks
-
-
                         else:
                             p = Pitch(note['pitch'])
                             # Force all flats
@@ -229,13 +234,9 @@ class Piece(object):
                                 p = p.getEnharmonic()
                             n = Note(p)
 
-                            # TODO add slurs
-                            # TODO add glissandos
-                            # TODO add -50 cent marks
-
                         d = Duration()
                         if note['duration'] == 0:
-                            d.quarterLength = .5
+                            d.quarterLength = .125
                             d = d.getGraceDuration()
                         else:
                             d.fill(note['durations'])
@@ -273,6 +274,7 @@ class Song(object):
 
         self.duration_beats = self.form.duration
         self.tempo = random.randint(40, 50)
+
         self.bars[0].tempo = self.tempo
         self.duration_minutes = self.duration_beats / float(self.tempo)
 
