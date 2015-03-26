@@ -274,7 +274,7 @@ class Song(object):
         self.bars = self.form.bars
 
         self.duration_beats = self.form.duration
-        self.tempo = random.randint(52, 65)
+        self.tempo = random.randint(50, 60)
 
         self.bars[0].tempo = self.tempo
         self.duration_minutes = self.duration_beats / float(self.tempo)
