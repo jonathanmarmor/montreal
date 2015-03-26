@@ -292,16 +292,31 @@ class Song(object):
             # Melody
             bar_type.melody = self.choose_melody_notes(bar_type.duration, bar_type.harmony)
 
-        all_harmonies = []
-        all_melody_pitches = []
         size = 1
-        repeat = False
         for bar in self.bars:
-
-            # bar.parts = bar.type_obj.parts
 
             bar.melody = bar.type_obj.melody
             bar.harmony = bar.type_obj.harmony
+
+            transposition = random.choice([-2, -2, -2, -1, -1, 0, 0, 0, 1, 2, 2])
+
+            if transposition != 0:
+                melody = []
+                for note in bar.melody:
+                    melody.append({
+                        'pitch': note['pitch'] + transposition,
+                        'duration': note['duration']
+                    })
+                bar.melody = melody
+
+                harmony = []
+                for note in bar.harmony:
+                    harmony.append({
+                        'pitch': [p + transposition for p in note['pitch']],
+                        'duration': note['duration']
+                    })
+                bar.harmony = harmony
+
 
             soloist_options = [
                 'fl',
