@@ -539,7 +539,7 @@ class Song(object):
 
 
     def add_ornament(self, note, prev, harmonies):
-        if (prev['duration'] <= .25 and random.random() < .4) or random.random() < .08:
+        if prev['duration'] <= .25 or random.random() < .08:
             return
 
         # print prev, note, harmonies
