@@ -218,22 +218,23 @@ class Piece(object):
                     for note in part['notes']:
                         if note['pitch'] == 'rest':
                             n = Rest()
-                        if isinstance(note['pitch'], list):
-                            pitches = []
-                            for pitch_number in note['pitch']:
-                                p = Pitch(pitch_number)
+                        else:
+                            if isinstance(note['pitch'], list):
+                                pitches = []
+                                for pitch_number in note['pitch']:
+                                    p = Pitch(pitch_number)
+                                    # Force all flats
+                                    if p.accidental.name == 'sharp':
+                                        p = p.getEnharmonic()
+                                    pitches.append(p)
+                                n = Chord(notes=pitches)
+
+                            else:
+                                p = Pitch(note['pitch'])
                                 # Force all flats
                                 if p.accidental.name == 'sharp':
                                     p = p.getEnharmonic()
-                                pitches.append(p)
-                            n = Chord(notes=pitches)
-
-                        else:
-                            p = Pitch(note['pitch'])
-                            # Force all flats
-                            if p.accidental.name == 'sharp':
-                                p = p.getEnharmonic()
-                            n = Note(p)
+                                n = Note(p)
 
                         d = Duration()
                         if note['duration'] == 0:
@@ -291,15 +292,30 @@ class Song(object):
             # Melody
             bar_type.melody = self.choose_melody_notes(bar_type.duration, bar_type.harmony)
 
+        all_harmonies = []
+        all_melody_pitches = []
         for bar in self.bars:
+
+            print bar.type
             # bar.parts = bar.type_obj.parts
 
             bar.melody = bar.type_obj.melody
             bar.harmony = bar.type_obj.harmony
 
+            soloist_options = [
+                'fl',
+                'ob',
+                'cl',
+                'sax',
+                'tpt',
+                'vln',
+            ]
+            soloist = random.choice(soloist_options)
+            soloist_options.remove(soloist)
+
             bar.parts = [
                 {
-                    'instrument_name': 'vln',
+                    'instrument_name': soloist,
                     'notes': bar.melody,
                 },
                 {
@@ -307,6 +323,16 @@ class Song(object):
                     'notes': bar.harmony,
                 },
             ]
+
+            bar_of_rests = [{
+                'pitch': 'rest',
+                'duration': bar.duration,
+            }]
+            for inst in soloist_options:
+                bar.parts.append({
+                    'instrument_name': inst,
+                    'notes': bar_of_rests,
+                })
 
     def choose_root(self):
         return random.randint(0, 11)
@@ -396,28 +422,16 @@ class Song(object):
 
         previous_note = {'duration': 1.0, 'pitch': prev}
 
-        print
-        print '*'*80
-        print 'harmonies:', harmonies
-        print
-
         pitch_history = []
 
         for note in notes:
-            print
-            print 'NOTE:', note
             beats = list(frange(note['start'], note['start'] + note['duration'], .25))
             note_harmonies = []
             for b in beats:
-                print b
                 h = get_at(b, harmonies)
                 h = h['pitch_classes']
-                print h
                 if h not in note_harmonies:
                     note_harmonies.append(h)
-            print 'note_harmonies', note_harmonies
-
-            # print 'note_harmonies', note_harmonies
 
             if len(note_harmonies) == 1:
                 pitch_options = self.get_pitch_options(note_harmonies[0], prev)
@@ -449,9 +463,6 @@ class Song(object):
                 pitch_options = [prev - 2, prev - 1, prev + 1, prev + 2]
 
             note['pitch'] = random.choice(pitch_options)
-
-            # print note['pitch'] % 12
-            # print
 
             self.add_ornament(note, previous_note, note_harmonies)
 
