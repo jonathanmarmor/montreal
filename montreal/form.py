@@ -32,6 +32,9 @@ class Bar(object):
         self.duration = 2
         self.tempo = None
 
+        self.melody = []
+        self.harmony = []
+
     def __repr__(self):
         return '{}{}'.format(self.type, self.duration)
 
@@ -41,17 +44,8 @@ class BarType(object):
         self.name = name
         self.duration = duration
 
-        names = [
-            'fl',
-            'ob',
-            'cl',
-            'sax',
-            'tpt',
-            'vln',
-            'vib',
-            'bs'
-        ]
-        self.parts = [{'instrument_name': n, 'notes': []} for n in names]
+        self.melody = []
+        self.harmony = []
 
     def __repr__(self):
         return 'Bar Type: name: {} duration: {} parts: '.format(self.name, self.duration, self.parts)

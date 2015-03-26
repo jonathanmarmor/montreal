@@ -265,7 +265,6 @@ class Song(object):
         self.piece = piece
         self.prev_root = random.randint(0, 11)
         self.harmony_generator = get_harmony_generator()
-        # TODO choose roots
 
         self.vln_all_notes = self.piece.instruments.vln.all_notes
         self.vln_register = self.choose_violin_register()
@@ -283,19 +282,31 @@ class Song(object):
             bar_type = self.form.bar_types[name]
             bar_type.harmonic_rhythm = harmonic_rhythm.choose(bar_type.duration)
 
-            # Vibraphone
-            vibraphone = get_by_attr(bar_type.parts, 'instrument_name', 'vib')
-            vibraphone['notes'] = [{
+            # Harmony
+            bar_type.harmony = [{
                 'duration': harm_dur,
                 'pitch': self.choose_harmony()
             } for harm_dur in bar_type.harmonic_rhythm]
 
-            # Violin
-            violin = get_by_attr(bar_type.parts, 'instrument_name', 'vln')
-            violin['notes'] = self.choose_melody_notes(bar_type.duration, vibraphone['notes'])
+            # Melody
+            bar_type.melody = self.choose_melody_notes(bar_type.duration, bar_type.harmony)
 
         for bar in self.bars:
-            bar.parts = bar.type_obj.parts
+            # bar.parts = bar.type_obj.parts
+
+            bar.melody = bar.type_obj.melody
+            bar.harmony = bar.type_obj.harmony
+
+            bar.parts = [
+                {
+                    'instrument_name': 'vln',
+                    'notes': bar.melody,
+                },
+                {
+                    'instrument_name': 'vib',
+                    'notes': bar.harmony,
+                },
+            ]
 
     def choose_root(self):
         return random.randint(0, 11)
