@@ -298,7 +298,10 @@ class Song(object):
             bar.melody = bar.type_obj.melody
             bar.harmony = bar.type_obj.harmony
 
-            transposition = random.choice([-2, -2, -2, -1, -1, 0, 0, 0, 1, 2, 2])
+            transposition = weighted_choice(
+                [-3, -2, -1, 0, 1, 2,  3],
+                [1,  10, 12, 2, 8, 12, 1]
+            )
 
             if transposition != 0:
                 melody = []
