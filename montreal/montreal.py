@@ -44,6 +44,49 @@ from chord_types import get_harmony_generator
 from melody_rhythm import get_melody_rhythm
 
 
+def frange(x, y, step=1.0):
+    while x < y:
+        yield x
+        x += step
+
+
+def choose(options, chosen):
+    choice = random.choice(options)
+    if chosen and chosen[-1] == choice:
+        choice = choose(options, chosen)
+    return choice
+
+
+def ornament(a, b, n=None, prev_duration=0.75, width=2):
+    interval = b - a
+    abs_interval = abs(interval)
+    direction = 0
+    if interval > 0:
+        direction = 1
+    if interval < 0:
+        direction = -1
+
+    if n == None:
+        # Choose the number of notes in the ornament
+        max_notes = 3
+        if prev_duration >= 0.75:
+            max_notes = 6
+        n = random.randint(1, 3)
+
+    offset_interval = float(interval) / n
+    option_groups = []
+    for offset in list(frange(a, b, offset_interval)):
+        middle = int(round(offset))
+        opts = range(middle - width, middle + width + 1)
+        option_groups.append(opts)
+
+    ornaments = []
+    for opts in option_groups:
+        choice = choose(opts, ornaments)
+        ornaments.append(choice)
+    return ornaments
+
+
 class Instruments(object):
     def __init__(self):
         self.names = [
