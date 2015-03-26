@@ -274,7 +274,7 @@ class Song(object):
         self.bars = self.form.bars
 
         self.duration_beats = self.form.duration
-        self.tempo = random.randint(40, 50)
+        self.tempo = random.randint(52, 65)
 
         self.bars[0].tempo = self.tempo
         self.duration_minutes = self.duration_beats / float(self.tempo)
@@ -299,8 +299,8 @@ class Song(object):
             bar.harmony = bar.type_obj.harmony
 
             transposition = weighted_choice(
-                [-3, -2, -1, 0, 1, 2,  3],
-                [1,  10, 12, 2, 8, 12, 1]
+                [-2, -1, 0, 1, 2],
+                [10, 12, 2, 8, 12]
             )
 
             if transposition != 0:
