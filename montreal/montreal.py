@@ -294,9 +294,10 @@ class Song(object):
 
         all_harmonies = []
         all_melody_pitches = []
+        size = 1
+        repeat = False
         for bar in self.bars:
 
-            print bar.type
             # bar.parts = bar.type_obj.parts
 
             bar.melody = bar.type_obj.melody
@@ -308,22 +309,68 @@ class Song(object):
                 'cl',
                 'sax',
                 'tpt',
-                'vln',
             ]
-            soloist = random.choice(soloist_options)
-            soloist_options.remove(soloist)
+            soloists = []
+
+            for _ in range(size):
+                soloist = random.choice(soloist_options)
+                soloists.append(soloist)
+                soloist_options.remove(soloist)
+
+            violin = []
+            for chord in bar.harmony:
+                violin.append({
+                    'duration': chord['duration'],
+                    'pitch': random.choice(chord['pitch']),
+                })
+
+            bass = []
+            for chord in bar.harmony:
+                bass.append({
+                    'duration': chord['duration'],
+                    'pitch': random.choice(chord['pitch']) - 12,
+                })
 
             bar.parts = [
                 {
-                    'instrument_name': soloist,
-                    'notes': bar.melody,
+                    'instrument_name': 'vln',
+                    'notes': violin,
                 },
                 {
                     'instrument_name': 'vib',
                     'notes': bar.harmony,
                 },
+                {
+                    'instrument_name': 'bs',
+                    'notes': bass,
+                },
             ]
 
+            for soloist in soloists:
+                bar.parts.append({
+                    'instrument_name': soloist,
+                    'notes': bar.melody,
+                })
+
+            if size > 1:
+                num_accompanists = random.randint(1, len(soloist_options))
+                accompanists = random.sample(soloist_options, num_accompanists)
+                for acc in accompanists:
+                    soloist_options.remove(acc)
+
+                    notes = []
+                    for chord in bar.harmony:
+                        notes.append({
+                            'duration': chord['duration'],
+                            'pitch': random.choice(chord['pitch']),
+                        })
+
+                    bar.parts.append({
+                        'instrument_name': acc,
+                        'notes': notes,
+                    })
+
+            # Put rests in instruments that aren't playing in this bar
             bar_of_rests = [{
                 'pitch': 'rest',
                 'duration': bar.duration,
@@ -333,6 +380,8 @@ class Song(object):
                     'instrument_name': inst,
                     'notes': bar_of_rests,
                 })
+
+            size = 1 if size == 2 else 2
 
     def choose_root(self):
         return random.randint(0, 11)
