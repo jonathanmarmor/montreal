@@ -45,9 +45,14 @@ from melody_rhythm import get_melody_rhythm
 
 
 def frange(x, y, step=1.0):
-    while x < y:
-        yield x
-        x += step
+    if step > 0:
+        while x < y:
+            yield x
+            x += step
+    if step < 0:
+        while x > y:
+            yield x
+            x += step
 
 
 def choose(options, chosen):
@@ -57,7 +62,9 @@ def choose(options, chosen):
     return choice
 
 
-def ornament(a, b, n=None, prev_duration=0.75, width=2):
+def ornament_bridge(a, b, n=None, prev_duration=0.75, width=2):
+    """Find notes that bridge the interval between a and b"""
+
     interval = b - a
     abs_interval = abs(interval)
     direction = 0
@@ -73,17 +80,22 @@ def ornament(a, b, n=None, prev_duration=0.75, width=2):
             max_notes = 6
         n = random.randint(1, 3)
 
-    offset_interval = float(interval) / n
-    option_groups = []
-    for offset in list(frange(a, b, offset_interval)):
-        middle = int(round(offset))
-        opts = range(middle - width, middle + width + 1)
-        option_groups.append(opts)
+    if direction == 0:
+        option_groups = [range(int(a - width), int(a + width + 1))] * n
+
+    else:
+        offset_interval = float(interval) / n
+        option_groups = []
+        for offset in list(frange(a, b, offset_interval)):
+            middle = int(round(offset))
+            opts = range(middle - width, middle + width + 1)
+            option_groups.append(opts)
 
     ornaments = []
     for opts in option_groups:
         choice = choose(opts, ornaments)
         ornaments.append(choice)
+
     return ornaments
 
 
@@ -582,88 +594,99 @@ class Song(object):
 
 
     def add_ornament(self, note, prev, harmonies):
-        if prev['duration'] <= .25 or random.random() < .08:
+        if prev['duration'] <= .25:  # or random.random() < .08:
             return
 
-        # print prev, note, harmonies
+        if random.random() < -5:  # .5:
 
-        # harmonies = [p for p in [h for h in harmonies]]
+            # print prev, note, harmonies
 
-        interval = note['pitch'] - prev['pitch']
-        if interval > 0:
-            direction = 'ascending'
-        if interval < 0:
-            direction = 'descending'
-        if interval == 0:
-            direction = random.choice(['ascending', 'descending'])
+            # harmonies = [p for p in [h for h in harmonies]]
 
-        np = int(note['pitch'])
+            interval = note['pitch'] - prev['pitch']
+            if interval > 0:
+                direction = 'ascending'
+            if interval < 0:
+                direction = 'descending'
+            if interval == 0:
+                direction = random.choice(['ascending', 'descending'])
 
-        # below = [p for p in range(np - 4,  np) if p % 12 in harmonies]
-        # above = [p for p in range(np + 1,  np + 5) if p % 12 in harmonies]
+            np = int(note['pitch'])
 
-        orn_types = {}
-        orn_types['ascending'] = [
-            [np - 1],
-            [np - 2],
-            [np - 1],
-            [np - 2],
-            [np - 1],
-            [np - 2],
-            [np - 1],
-            [np - 2],
-            [np - 2, np - 1],
-            [np - 3, np - 1],
-            [np - 3, np - 2],
-            [np - 4, np - 2],
-            [np, np - 1],
-            [np, np - 2],
-            [np - 1, np - 2],
-            [np - 1, np - 3],
-            [np - 2, np - 3],
-            [np - 2, np - 4],
+            # below = [p for p in range(np - 4,  np) if p % 12 in harmonies]
+            # above = [p for p in range(np + 1,  np + 5) if p % 12 in harmonies]
 
-            [np - 1, np + 1],
-            [np - 1, np + 2],
-            [np - 2, np + 1],
-            [np - 2, np + 2],
-            [np + 1, np - 1],
-            [np + 1, np - 2],
-            [np + 2, np - 1],
-            [np + 2, np - 2]
-        ]
-        orn_types['descending'] = [
-            [np + 1],
-            [np + 2],
-            [np + 1],
-            [np + 2],
-            [np + 1],
-            [np + 2],
-            [np + 1],
-            [np + 2],
-            [np + 2, np + 1],
-            [np + 3, np + 1],
-            [np + 3, np + 2],
-            [np + 4, np + 2],
-            [np, np + 1],
-            [np, np + 2],
-            [np + 1, np + 2],
-            [np + 1, np + 3],
-            [np + 2, np + 3],
-            [np + 2, np + 4],
+            orn_types = {}
+            orn_types['ascending'] = [
+                [np - 1],
+                [np - 2],
+                [np - 1],
+                [np - 2],
+                [np - 1],
+                [np - 2],
+                [np - 1],
+                [np - 2],
+                [np - 2, np - 1],
+                [np - 3, np - 1],
+                [np - 3, np - 2],
+                [np - 4, np - 2],
+                [np, np - 1],
+                [np, np - 2],
+                [np - 1, np - 2],
+                [np - 1, np - 3],
+                [np - 2, np - 3],
+                [np - 2, np - 4],
 
-            [np - 1, np + 1],
-            [np - 1, np + 2],
-            [np - 2, np + 1],
-            [np - 2, np + 2],
-            [np + 1, np - 1],
-            [np + 1, np - 2],
-            [np + 2, np - 1],
-            [np + 2, np - 2]
-        ]
+                [np - 1, np + 1],
+                [np - 1, np + 2],
+                [np - 2, np + 1],
+                [np - 2, np + 2],
+                [np + 1, np - 1],
+                [np + 1, np - 2],
+                [np + 2, np - 1],
+                [np + 2, np - 2]
+            ]
+            orn_types['descending'] = [
+                [np + 1],
+                [np + 2],
+                [np + 1],
+                [np + 2],
+                [np + 1],
+                [np + 2],
+                [np + 1],
+                [np + 2],
+                [np + 2, np + 1],
+                [np + 3, np + 1],
+                [np + 3, np + 2],
+                [np + 4, np + 2],
+                [np, np + 1],
+                [np, np + 2],
+                [np + 1, np + 2],
+                [np + 1, np + 3],
+                [np + 2, np + 3],
+                [np + 2, np + 4],
 
-        orn_type = random.choice(orn_types[direction])
+                [np - 1, np + 1],
+                [np - 1, np + 2],
+                [np - 2, np + 1],
+                [np - 2, np + 2],
+                [np + 1, np - 1],
+                [np + 1, np - 2],
+                [np + 2, np - 1],
+                [np + 2, np - 2]
+            ]
 
+            orn_type = random.choice(orn_types[direction])
+
+        else:
+
+            orn_type = ornament_bridge(
+                prev['pitch'],
+                note['pitch'],
+                n=None,
+                prev_duration=prev['duration'],
+                width=2
+            )
 
         note['ornaments'] = []
         for n in orn_type:
