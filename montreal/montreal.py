@@ -329,11 +329,16 @@ class Song(object):
         self.prev_root = random.randint(0, 11)
         self.harmony_generator = get_harmony_generator()
 
+        self.instruments = self.piece.instruments
+
         self.vln_all_notes = self.piece.instruments.vln.all_notes
         self.vln_register = self.choose_violin_register()
 
-        bass_prev_pitch = None
-        violin_prev_pitch = None
+
+        history = {}
+        for name in self.instruments.names:
+            history[name] = []
+
 
 
         self.form = form.choose()
@@ -419,34 +424,56 @@ class Song(object):
             # Violin
             violin_lowest = self.piece.instruments.vln.lowest_note.ps
             violin_highest = self.piece.instruments.vln.highest_note.ps
-            if violin_prev_pitch == None:
+            if not history['vln']:
                 violin_prev_pitch = random.randint(violin_lowest + 7, violin_highest - 12)
+                history['vln'].append(violin_prev_pitch)
 
             violin = []
             for chord in bar.harmony:
-                pitch = next_violin_note(violin_prev_pitch, chord['pitch'], violin_lowest, violin_highest)
+                pitch = next_violin_note(history['vln'][-1], chord['pitch'], violin_lowest, violin_highest)
 
                 violin.append({
                     'duration': chord['duration'],
                     'pitch': pitch,
                 })
-                violin_prev_pitch = pitch
+                history['vln'].append(pitch)
+
+            # # Vibraphone
+            # vib_lowest = self.piece.instruments.vib.lowest_note.ps
+            # vib_highest = self.piece.instruments.vib.highest_note.ps
+            # if vib_prev_chord == None:
+            #     vib_prev_chord = random.randint(vib_lowest, vib_lowest + 18)
+
+            # bass = []
+            # for chord in bar.harmony:
+            #     pitch = next_bass_note(bass_prev_pitch, chord['pitch'], bass_lowest, bass_highest)
+
+            #     bass.append({
+            #         'duration': chord['duration'],
+            #         'pitch': pitch,
+            #     })
+
+            #     bass_prev_pitch = pitch
+
 
             # Bass
             bass_lowest = self.piece.instruments.bs.lowest_note.ps
             bass_highest = self.piece.instruments.bs.highest_note.ps
-            if bass_prev_pitch == None:
+            if not history['bs']:
                 bass_prev_pitch = random.randint(bass_lowest, bass_lowest + 18)
+                history['bs'].append(bass_prev_pitch)
+
 
             bass = []
             for chord in bar.harmony:
-                pitch = next_bass_note(bass_prev_pitch, chord['pitch'], bass_lowest, bass_highest)
+                pitch = next_bass_note(history['bs'][-1], chord['pitch'], bass_lowest, bass_highest)
 
                 bass.append({
                     'duration': chord['duration'],
                     'pitch': pitch,
                 })
-                bass_prev_pitch = pitch
+                history['bs'].append(pitch)
+
 
 
             bar.parts = [
@@ -471,7 +498,7 @@ class Song(object):
                 })
 
             if size > 1:
-                num_accompanists = random.randint(1, len(soloist_options))
+                num_accompanists = random.randint(2, len(soloist_options))
                 accompanists = random.sample(soloist_options, num_accompanists)
                 for acc in accompanists:
                     soloist_options.remove(acc)
@@ -499,7 +526,7 @@ class Song(object):
                     'notes': bar_of_rests,
                 })
 
-            size = 1 if size == 2 else 2
+            size = 1 if size > 1 else random.choice([2, 2, 2, 2, 3])
 
     def choose_root(self):
         return random.randint(0, 11)
