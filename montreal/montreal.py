@@ -44,6 +44,7 @@ from chord_types import get_harmony_generator
 from melody_rhythm import get_melody_rhythm
 import scored_ornaments
 from bass import next_bass_note
+from violin import next_violin_note
 
 
 def frange(x, y, step=1.0):
@@ -332,6 +333,7 @@ class Song(object):
         self.vln_register = self.choose_violin_register()
 
         bass_prev_pitch = None
+        violin_prev_pitch = None
 
 
         self.form = form.choose()
@@ -413,13 +415,22 @@ class Song(object):
                 soloists.append(soloist)
                 soloist_options.remove(soloist)
 
+
+            # Violin
+            violin_lowest = self.piece.instruments.vln.lowest_note.ps
+            violin_highest = self.piece.instruments.vln.highest_note.ps
+            if violin_prev_pitch == None:
+                violin_prev_pitch = random.randint(violin_lowest + 7, violin_highest - 12)
+
             violin = []
             for chord in bar.harmony:
+                pitch = next_violin_note(violin_prev_pitch, chord['pitch'], violin_lowest, violin_highest)
+
                 violin.append({
                     'duration': chord['duration'],
-                    'pitch': random.choice(chord['pitch']),
+                    'pitch': pitch,
                 })
-
+                violin_prev_pitch = pitch
 
             # Bass
             bass_lowest = self.piece.instruments.bs.lowest_note.ps
