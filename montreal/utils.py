@@ -261,3 +261,8 @@ def midi_note_number_to_scientific_name(number):
 def get_by_attr(items, key, value):
     return next((item for item in items if item.get(key) == value), None)
 
+
+def exp_weights(n, exponent=2, reverse=True):
+    weights = [(x + 1) ** exponent for x in range(n)]
+    weights.reverse()
+    return weights

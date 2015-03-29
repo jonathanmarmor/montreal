@@ -43,6 +43,7 @@ import form
 from chord_types import get_harmony_generator
 from melody_rhythm import get_melody_rhythm
 import scored_ornaments
+from bass import next_bass_note
 
 
 def frange(x, y, step=1.0):
@@ -330,6 +331,9 @@ class Song(object):
         self.vln_all_notes = self.piece.instruments.vln.all_notes
         self.vln_register = self.choose_violin_register()
 
+        bass_prev_pitch = None
+
+
         self.form = form.choose()
         self.bars = self.form.bars
 
@@ -352,11 +356,25 @@ class Song(object):
             # Melody
             bar_type.melody = self.choose_melody_notes(bar_type.duration, bar_type.harmony)
 
+
+        #### Turn Bar Types into Bars
+
         size = 1
         for bar in self.bars:
 
             bar.melody = bar.type_obj.melody
             bar.harmony = bar.type_obj.harmony
+
+            # Choose instrumentation and texture
+            # - soloists
+            # - echoing accompanists
+            # - chordal accompanists
+            # - resting
+
+
+
+
+
 
             transposition = weighted_choice(
                 [-2, -1, 0, 1, 2],
@@ -402,12 +420,23 @@ class Song(object):
                     'pitch': random.choice(chord['pitch']),
                 })
 
+
+            # Bass
+            bass_lowest = self.piece.instruments.bs.lowest_note.ps
+            bass_highest = self.piece.instruments.bs.highest_note.ps
+            if bass_prev_pitch == None:
+                bass_prev_pitch = random.randint(bass_lowest, bass_lowest + 18)
+
             bass = []
             for chord in bar.harmony:
+                pitch = next_bass_note(bass_prev_pitch, chord['pitch'], bass_lowest, bass_highest)
+
                 bass.append({
                     'duration': chord['duration'],
-                    'pitch': random.choice(chord['pitch']) - 12,
+                    'pitch': pitch,
                 })
+                bass_prev_pitch = pitch
+
 
             bar.parts = [
                 {

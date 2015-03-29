@@ -50,34 +50,34 @@ def make_orn_types():
                 orn_types[n][direction].append(comb)
     return orn_types
 
+# This is broken
+# def write(orn_types):
+#     string = []
+#     string.append('orn_types = {')
+#     for n in range(1, 5):
+#         string.append('\t{}: {{'.format(n))
+#         for direction in ['ascending', 'descending']:
 
-def write(orn_types):
-    string = []
-    string.append('orn_types = {')
-    for n in range(1, 5):
-        string.append('\t{}: {{'.format(n))
-        for direction in ['ascending', 'descending']:
+#             string.append('\t\t{}: S('.format(direction))
 
-            string.append('\t\t{}: S('.format(direction))
+#             string.append('\t\t\t(75, S(')
+#             string.append('\t\t\t')
+#             string.append('\t\t\t),')
 
-            string.append('\t\t\t(75, S(')
-            string.append('\t\t\t')
-            string.append('\t\t\t),')
+#             string.append('\t\t\t(20, S(')
+#             for orn in orn_types[n][direction]:
+#                 string.append('\t\t\t\t(50, {}),'.format(orn))
+#             string.append('\t\t\t),')
 
-            string.append('\t\t\t(20, S(')
-            for orn in orn_types[n][direction]:
-                string.append('\t\t\t\t(50, {}),'.format(orn))
-            string.append('\t\t\t),')
+#             string.append('\t\t\t(5, S(')
+#             string.append('\t\t\t')
+#             string.append('\t\t\t),')
 
-            string.append('\t\t\t(5, S(')
-            string.append('\t\t\t')
-            string.append('\t\t\t),')
+#             string.append('\t\t},')
 
-            string.append('\t\t},')
-
-        string.append('\t},')
-    string.append('}')
-    return '\n'.join(string)
+#         string.append('\t},')
+#     string.append('}')
+#     return '\n'.join(string)
 
 
 def main():
