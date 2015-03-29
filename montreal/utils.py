@@ -160,7 +160,9 @@ def get_inversions(chord):
 
 
 class S(object):
-    def __init__(self, *args):
+    def __init__(self, *args, **kwargs):
+        if 'arguments' in kwargs:
+            args = kwargs['arguments']
         self.weighted_options = args
 
     def choose(self):
