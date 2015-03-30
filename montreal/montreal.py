@@ -385,14 +385,22 @@ class Song(object):
         self.bars[0].tempo = self.tempo
         self.duration_minutes = self.duration_beats / float(self.tempo)
 
+
+        self.harmony_history = [self.choose_harmony()]
+
         for name in self.form.bar_types:
             bar_type = self.form.bar_types[name]
             bar_type.harmonic_rhythm = harmonic_rhythm.choose(bar_type.duration)
 
+            # harmony = animal_play_harmony.choose_next_harmony(self.harmony_history, options)
+
+            harmony = self.choose_harmony()
+            print harmony
+
             # Harmony
             bar_type.harmony = [{
                 'duration': harm_dur,
-                'pitch': self.choose_harmony()
+                'pitch': harmony
             } for harm_dur in bar_type.harmonic_rhythm]
 
             # Melody
@@ -504,23 +512,20 @@ class Song(object):
                 })
                 history['vln'].append(pitch)
 
-            # # Vibraphone
-            # vib_lowest = self.piece.instruments.vib.lowest_note.ps
-            # vib_highest = self.piece.instruments.vib.highest_note.ps
+            # Vibraphone
+            vib_lowest = self.piece.instruments.vib.lowest_note.ps
+            vib_highest = self.piece.instruments.vib.highest_note.ps
             # if vib_prev_chord == None:
             #     vib_prev_chord = random.randint(vib_lowest, vib_lowest + 18)
 
-            # bass = []
-            # for chord in bar.harmony:
-            #     pitch = next_bass_note(bass_prev_pitch, chord['pitch'], bass_lowest, bass_highest)
+            vibraphone = []
+            for harm in bar.harmony:
+                vib_pitches = [p + vib_lowest + 7 for p in harm['pitch']]
 
-            #     bass.append({
-            #         'duration': chord['duration'],
-            #         'pitch': pitch,
-            #     })
-
-            #     bass_prev_pitch = pitch
-
+                vibraphone.append({
+                    'duration': harm['duration'],
+                    'pitch': vib_pitches,
+                })
 
             # Bass
             bass_lowest = self.piece.instruments.bs.lowest_note.ps
@@ -549,7 +554,7 @@ class Song(object):
                 },
                 {
                     'instrument_name': 'vib',
-                    'notes': bar.harmony,
+                    'notes': vibraphone,
                 },
                 {
                     'instrument_name': 'bs',
@@ -634,7 +639,7 @@ class Song(object):
         return self.build_chord(root, chord_type)
 
     def build_chord(self, root, chord_type):
-        return [p + root + 48 for p in chord_type]
+        return [(p + root) % 12 for p in chord_type]
 
     def choose_violin_register(self):
         lowest = random.randint(0, 18)
