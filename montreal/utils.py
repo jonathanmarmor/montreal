@@ -1,5 +1,6 @@
 import random
 from itertools import combinations, groupby
+import itertools
 from collections import Counter, defaultdict
 
 
@@ -266,3 +267,10 @@ def exp_weights(n, exponent=2, reverse=True):
     weights = [(x + 1) ** exponent for x in range(n)]
     weights.reverse()
     return weights
+
+
+def pairwise(iterable):
+    """s -> (s0,s1), (s1,s2), (s2,s3), ..."""
+    a, b = itertools.tee(iterable)
+    next(b, None)
+    return itertools.izip(a, b)

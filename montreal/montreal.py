@@ -46,6 +46,7 @@ import scored_ornaments
 from bass import next_bass_note
 from violin import next_violin_note
 from simple_accompaniment import next_simple_accompaniment_note
+import animal_play_harmony
 
 
 soloists_history = Counter()
@@ -386,22 +387,32 @@ class Song(object):
         self.duration_minutes = self.duration_beats / float(self.tempo)
 
 
-        self.harmony_history = [self.choose_harmony()]
+        root = random.randint(0, 12)
+        self.harmony_history = [[(p * root) % 12 for p in self.choose_harmony()]]
 
         for name in self.form.bar_types:
             bar_type = self.form.bar_types[name]
             bar_type.harmonic_rhythm = harmonic_rhythm.choose(bar_type.duration)
 
-            # harmony = animal_play_harmony.choose_next_harmony(self.harmony_history, options)
-
-            harmony = self.choose_harmony()
-            print harmony
+            chord_type_options = []
+            while len(chord_type_options) < 5:
+                harm = self.harmony_generator.next()
+                if harm not in chord_type_options:
+                    chord_type_options.append(harm)
 
             # Harmony
-            bar_type.harmony = [{
-                'duration': harm_dur,
-                'pitch': harmony
-            } for harm_dur in bar_type.harmonic_rhythm]
+            bar_type.harmony = []
+            for harm_dur in bar_type.harmonic_rhythm:
+                harmony = animal_play_harmony.choose_next_harmony(self.harmony_history, chord_type_options)
+                self.harmony_history.append(harmony)
+
+                print 'HARMONY:', harmony
+
+                h = {
+                    'duration': harm_dur,
+                    'pitch': harmony
+                }
+                bar_type.harmony.append(h)
 
             # Melody
             bar_type.melody = self.choose_melody_notes(bar_type.duration, bar_type.harmony)
