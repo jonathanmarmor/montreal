@@ -240,21 +240,20 @@ class Piece(object):
         total_minutes = 0
         n = 1
         while total_minutes < piece_duration_minutes:
-            print '=/' * 50
+            print
             print 'Song', n
             n += 1
             song = Song(self)
             songs.append(song)
-            # print 'Song Duration:', int(round(song.duration_minutes * 60.0))
-            # print 'Tempo:', song.tempo
-            # print 'Number of Beats:', song.duration_beats
-            # print
+            print 'Song Duration:', int(round(song.duration_minutes * 60.0))
+            print 'Tempo:', song.tempo
+            print 'Number of Beats:', song.duration_beats
             total_minutes += song.duration_minutes
 
         _minutes, _seconds = divmod(total_minutes, 1.0)
-        # print
-        # print 'Total Duration: {}:{}'.format(int(_minutes), int(round(_seconds * 60)))
-        # print
+        print
+        print 'Total Duration: {}:{}'.format(int(_minutes), int(round(_seconds * 60)))
+        print
 
         # Make notation
         previous_duration = None
@@ -646,7 +645,7 @@ class Song(object):
         pitch_history = []
 
         first = True
-        print '-'*10
+        # print '-'*10
         for note in notes:
             if first and start_with_rest:
                 note['pitch'] = 'rest'
@@ -693,7 +692,7 @@ class Song(object):
 
             self.add_ornament(note, previous_note, note_harmonies, first)
 
-            print note
+            # print note
 
             prev = note['pitch']
             previous_note = note
@@ -763,7 +762,6 @@ class Song(object):
 
 
 if __name__ == '__main__':
-    print 'STARTING!!!', '*' * 40
     show = True
     if 'ranges' in sys.argv:
         piece = Piece(ranges=True)
