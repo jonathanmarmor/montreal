@@ -247,19 +247,19 @@ class Piece(object):
         ]
 
         # 8 to 12 minutes
-        max_duration = 12 - .75
+        max_duration = 12
         piece_duration_minutes = scale(random.random(), 0, 1, 8, max_duration)
 
         # Make the "songs"
         songs = []
         total_minutes = 0
         n = 1
-        while total_minutes < piece_duration_minutes:
+        while total_minutes < piece_duration_minutes - .75:
             print
             print 'Song', n
-            n += 1
-            song = Song(self)
+            song = Song(self, n)
             songs.append(song)
+            n += 1
             print 'Song Duration:', int(round(song.duration_minutes * 60.0))
             print 'Tempo:', song.tempo
             print 'Number of Beats:', song.duration_beats
@@ -328,7 +328,7 @@ class Piece(object):
 
 
 class Song(object):
-    def __init__(self, piece):
+    def __init__(self, piece, movement):
         """
         self.duration = total song duration
         self.bars =
@@ -341,6 +341,7 @@ class Song(object):
 
         """
         self.piece = piece
+        self.movement = movement
         self.prev_root = random.randint(0, 11)
         self.harmony_generator = get_harmony_generator()
 
@@ -363,7 +364,23 @@ class Song(object):
         self.bars = self.form.bars
 
         self.duration_beats = self.form.duration
-        self.tempo = random.randint(50, 60)
+
+
+        if self.movement <= 6:
+            tempo_options = range(50, 62, 2)
+        elif self.movement > 6 and self.movement <= 11:
+            speed = random.choice(['fast', 'fast', 'slow'])
+            if speed == 'fast':
+                tempo_options = range(60, 72, 2)
+            else:
+                tempo_options = range(42, 54, 2)
+        elif self.movement > 11 and self.movement <= 14:
+            tempo_options = range(36, 48, 2)
+        if self.movement > 14:
+            tempo_options = range(26, 38, 2)
+
+        self.tempo = random.choice(tempo_options)
+
 
         self.bars[0].tempo = self.tempo
         self.duration_minutes = self.duration_beats / float(self.tempo)
