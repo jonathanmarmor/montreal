@@ -395,8 +395,12 @@ class Song(object):
             if transposition != 0:
                 melody = []
                 for note in bar.melody:
+                    if note['pitch'] == 'rest':
+                        new_pitch = 'rest'
+                    else:
+                        new_pitch = note['pitch'] + transposition
                     melody.append({
-                        'pitch': note['pitch'] + transposition,
+                        'pitch': new_pitch,
                         'duration': note['duration']
                     })
                 bar.melody = melody
@@ -592,13 +596,19 @@ class Song(object):
 
         rhythm = get_melody_rhythm(duration)
 
+        # One in four bars that have more than 3 notes will start with a rest
+        start_with_rest = False
+        if rhythm[0] <= 1.0:
+            if len(rhythm) > 2 and random.random() < .4:
+                start_with_rest = True
+
         for r in rhythm:
             notes.append({
                 'pitch': None,
                 'duration': r
             })
 
-        self.choose_melody_pitches(notes, self.vln_register, harmonies)
+        self.choose_melody_pitches(notes, self.vln_register, harmonies, start_with_rest)
 
         notes = self.add_ornaments(notes)
 
@@ -619,7 +629,7 @@ class Song(object):
             #     pitch_options = [p for p in pitch_options if p % 12 in note_harmonies]
         return pitch_options
 
-    def choose_melody_pitches(self, notes, register, harmonies):
+    def choose_melody_pitches(self, notes, register, harmonies, start_with_rest):
         # print 'Choosing pitches'
         for h in harmonies:
             h['pitch_classes'] = [p % 12 for p in h['pitch']]
@@ -638,6 +648,10 @@ class Song(object):
         first = True
         print '-'*10
         for note in notes:
+            if first and start_with_rest:
+                note['pitch'] = 'rest'
+                first = False
+                continue
             beats = list(frange(note['start'], note['start'] + note['duration'], .25))
             note_harmonies = []
             for b in beats:
