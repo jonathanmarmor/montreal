@@ -48,6 +48,9 @@ from violin import next_violin_note
 from simple_accompaniment import next_simple_accompaniment_note
 
 
+soloists_history = Counter()
+
+
 def frange(x, y, step=1.0):
     if step > 0:
         while x < y:
@@ -230,6 +233,18 @@ class Piece(object):
                 part.append(measure)
             return
 
+        self.duet_options = [
+            ('ob', 'sax'),
+            ('fl', 'sax'),
+            ('cl', 'sax'),
+            ('ob', 'tpt'),
+            ('sax', 'tpt'),
+            ('cl', 'tpt'),
+            ('fl', 'tpt'),
+            ('fl', 'ob'),
+            ('fl', 'cl'),
+            ('ob', 'cl'),
+        ]
 
         # 8 to 12 minutes
         max_duration = 12 - .75
@@ -412,21 +427,48 @@ class Song(object):
                     })
                 bar.harmony = harmony
 
+            if not self.piece.duet_options:
+                self.piece.duet_options = [
+                    ('ob', 'sax'),
+                    ('fl', 'sax'),
+                    ('cl', 'sax'),
+                    ('ob', 'tpt'),
+                    ('sax', 'tpt'),
+                    ('cl', 'tpt'),
+                    ('fl', 'tpt'),
+                    ('fl', 'ob'),
+                    ('fl', 'cl'),
+                    ('ob', 'cl'),
+                ]
 
             soloist_options = [
-                'fl',
                 'ob',
                 'cl',
                 'sax',
+                'fl',
                 'tpt',
+            ]
+            soloist_weights = [
+                39,
+                26,
+                15,
+                12,
+                8,
             ]
             soloists = []
 
-            for _ in range(size):
-                soloist = random.choice(soloist_options)
+            if size == 1:
+                soloist = weighted_choice(soloist_options, soloist_weights)
                 soloists.append(soloist)
                 soloist_options.remove(soloist)
+            elif size == 2:
+                duet = random.choice(self.piece.duet_options)
+                self.piece.duet_options.remove(duet)
+                for soloist in duet:
+                    soloists.append(soloist)
+                    soloist_options.remove(soloist)
 
+            soloists_history[tuple(sorted(soloists))] += 1
 
             # Violin
             violin_lowest = self.piece.instruments.vln.lowest_note.ps
@@ -778,3 +820,5 @@ if __name__ == '__main__':
             piece.score.show('musicxml', '/Applications/Finale 2012.app')
         else:
             piece.score.show('musicxml', '/Applications/Sibelius 7.5.app')
+
+    print soloists_history.most_common()
