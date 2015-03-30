@@ -45,6 +45,7 @@ from melody_rhythm import get_melody_rhythm
 import scored_ornaments
 from bass import next_bass_note
 from violin import next_violin_note
+from simple_accompaniment import next_simple_accompaniment_note
 
 
 def frange(x, y, step=1.0):
@@ -342,6 +343,9 @@ class Song(object):
 
 
         self.form = form.choose()
+
+        print self.form.form_string
+
         self.bars = self.form.bars
 
         self.duration_beats = self.form.duration
@@ -503,16 +507,29 @@ class Song(object):
                 for acc in accompanists:
                     soloist_options.remove(acc)
 
-                    notes = []
+                    lowest = self.piece.instruments.d[acc].lowest_note.ps
+                    highest = self.piece.instruments.d[acc].highest_note.ps
+                    if not history[acc]:
+                        quarter_of_register = (highest - lowest) / 4
+                        lower_limit = int(lowest + quarter_of_register)
+                        higher_limit = int(highest - quarter_of_register)
+
+                        prev_pitch = random.randint(lower_limit, higher_limit)
+                        history[acc].append(prev_pitch)
+
+                    acc_notes = []
                     for chord in bar.harmony:
-                        notes.append({
+                        pitch = next_simple_accompaniment_note(history[acc][-1], chord['pitch'], lowest, highest)
+
+                        acc_notes.append({
                             'duration': chord['duration'],
-                            'pitch': random.choice(chord['pitch']),
+                            'pitch': pitch,
                         })
+                        history[acc].append(pitch)
 
                     bar.parts.append({
                         'instrument_name': acc,
-                        'notes': notes,
+                        'notes': acc_notes,
                     })
 
             # Put rests in instruments that aren't playing in this bar
@@ -526,7 +543,7 @@ class Song(object):
                     'notes': bar_of_rests,
                 })
 
-            size = 1 if size > 1 else random.choice([2, 2, 2, 2, 3])
+            size = 1 if size > 1 else 2
 
     def choose_root(self):
         return random.randint(0, 11)
