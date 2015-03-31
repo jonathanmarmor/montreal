@@ -165,6 +165,18 @@ class Instruments(object):
             i.all_notes = list(frange(i.lowest_note.ps, i.highest_note.ps + 1))
             i.all_notes_24 = list(frange(i.lowest_note.ps, i.highest_note.ps + 1, 0.5))
 
+    def soloists_shared_register(self):
+        soloists = [
+            'ob',
+            'cl',
+            'sax',
+            'fl',
+            'tpt',
+        ]
+        lowest = int(max([self.d[name].lowest_note.ps for name in soloists]))
+        highest = int(min([self.d[name].highest_note.ps for name in soloists]))
+        return range(lowest, highest + 1)
+
 
 class Parts(object):
     def __init__(self, instruments):
@@ -348,8 +360,7 @@ class Song(object):
 
         self.instruments = self.piece.instruments
 
-        self.vln_all_notes = self.piece.instruments.vln.all_notes
-        self.vln_register = self.choose_violin_register()
+        self.melody_register = self.instruments.soloists_shared_register()
 
 
         history = {}
@@ -400,12 +411,12 @@ class Song(object):
 
                 chord_type = get_chord_type()
 
-                print 'CHORD TYPE:', chord_type
+                # print 'CHORD TYPE:', chord_type
 
                 harmony = animal_play_harmony.choose_next_harmony(self.harmony_history, chord_type)
                 self.harmony_history.append(harmony)
 
-                print 'HARMONY:', harmony
+                # print 'HARMONY:', harmony
 
                 h = {
                     'duration': harm_dur,
@@ -425,43 +436,6 @@ class Song(object):
 
             bar.melody = bar.type_obj.melody
             bar.harmony = bar.type_obj.harmony
-
-            # Choose instrumentation and texture
-            # - soloists
-            # - echoing accompanists
-            # - chordal accompanists
-            # - resting
-
-
-
-
-
-
-            transposition = weighted_choice(
-                [-2, -1, 1, 2],
-                [10, 12, 8, 12]
-            )
-
-            if transposition != 0:
-                melody = []
-                for note in bar.melody:
-                    if note['pitch'] == 'rest':
-                        new_pitch = 'rest'
-                    else:
-                        new_pitch = note['pitch'] + transposition
-                    melody.append({
-                        'pitch': new_pitch,
-                        'duration': note['duration']
-                    })
-                bar.melody = melody
-
-                harmony = []
-                for note in bar.harmony:
-                    harmony.append({
-                        'pitch': [p + transposition for p in note['pitch']],
-                        'duration': note['duration']
-                    })
-                bar.harmony = harmony
 
             if not self.piece.duet_options:
                 self.piece.duet_options = [
@@ -507,19 +481,37 @@ class Song(object):
             soloists_history[tuple(sorted(soloists))] += 1
 
 
-            # self.add_soloists_melody(soloists, bar)
+            transposition = self.add_soloists_melody(soloists, bar)
 
-            for soloist in soloists:
-                bar.parts.append({
-                    'instrument_name': soloist,
-                    'notes': bar.melody,
-                })
+            if transposition != 0:
+                melody = []
+                print 'before', bar.melody
+                for note in bar.melody:
+                    if note['pitch'] == 'rest':
+                        new_pitch = 'rest'
+                    else:
+                        new_pitch = note['pitch'] + transposition
+                    melody.append({
+                        'pitch': new_pitch,
+                        'duration': note['duration']
+                    })
+                bar.melody = melody
+                print 'after', bar.melody
+
+                harmony = []
+                for note in bar.harmony:
+                    harmony.append({
+                        'pitch': [p + transposition for p in note['pitch']],
+                        'duration': note['duration']
+                    })
+                bar.harmony = harmony
+
 
             # Violin
             violin_lowest = self.piece.instruments.vln.lowest_note.ps
             violin_highest = self.piece.instruments.vln.highest_note.ps
             if not history['vln']:
-                violin_prev_pitch = random.randint(violin_lowest + 7, violin_highest - 12)
+                violin_prev_pitch = random.randint(violin_lowest + 7, violin_highest - 18)
                 history['vln'].append(violin_prev_pitch)
 
             violin = []
@@ -628,6 +620,65 @@ class Song(object):
 
             size = 1 if size > 1 else 2
 
+    def add_soloists_melody(self, soloists, bar):
+        melody_pitches = []
+        for note in bar.melody:
+            if note['pitch'] != 'rest':
+                for orn in note.get('ornaments', []):
+                    melody_pitches.append(orn['pitch'])
+                melody_pitches.append(note['pitch'])
+
+        melody_lowest = min(melody_pitches)
+        melody_highest = max(melody_pitches)
+
+        if len(soloists) == 2:
+            lowest_a = int(self.piece.instruments.d[soloists[0]].lowest_note.ps)
+            highest_a = int(self.piece.instruments.d[soloists[0]].highest_note.ps)
+            register_a = range(lowest_a, highest_a + 1)
+
+            lowest_b = int(self.piece.instruments.d[soloists[1]].lowest_note.ps)
+            highest_b = int(self.piece.instruments.d[soloists[1]].highest_note.ps)
+            register_b = range(lowest_b, highest_b + 1)
+
+            register = list(set(register_a).intersection(set(register_b)))
+
+        else:
+            lowest = int(self.piece.instruments.d[soloists[0]].lowest_note.ps)
+            highest = int(self.piece.instruments.d[soloists[0]].highest_note.ps)
+
+            register = range(lowest, highest + 1)
+
+        register_lowest = min(register)
+        register_highest = max(register)
+
+        if melody_lowest >= register_lowest and melody_highest <= register_highest:
+            # No transposition necessary
+
+            for soloist in soloists:
+                bar.parts.append({
+                    'instrument_name': soloist,
+                    'notes': bar.melody,
+                })
+        else:
+            print 'melody_lowest', melody_lowest, 'register_lowest', register_lowest, 'melody_highest', melody_highest, 'register_highest', register_highest
+
+            for soloist in soloists:
+                bar.parts.append({
+                    'instrument_name': soloist,
+                    'notes': bar.melody,
+                })
+
+
+
+
+        transposition = 0
+        # transposition = weighted_choice(
+        #     [-2, -1, 1, 2],
+        #     [10, 12, 8, 12]
+        # )
+        return transposition
+
+
     def choose_root(self):
         return random.randint(0, 11)
 
@@ -657,11 +708,11 @@ class Song(object):
     def build_chord(self, root, chord_type):
         return [(p + root) % 12 for p in chord_type]
 
-    def choose_violin_register(self):
-        lowest = random.randint(0, 18)
-        width = random.randint(13, 22)
-        highest = lowest + width
-        return self.vln_all_notes[lowest:highest]
+    # def choose_violin_register(self):
+    #     lowest = random.randint(0, 18)
+    #     width = random.randint(13, 22)
+    #     highest = lowest + width
+    #     return self.vln_all_notes[lowest:highest]
 
     def choose_melody_notes(self, duration, harmonies):
         # return a list of {pitch, duration} dicts
@@ -687,7 +738,7 @@ class Song(object):
                 'duration': r
             })
 
-        self.choose_melody_pitches(notes, self.vln_register, harmonies, start_with_rest)
+        self.choose_melody_pitches(notes, self.melody_register, harmonies, start_with_rest)
 
         notes = self.add_ornaments(notes)
 
@@ -696,13 +747,13 @@ class Song(object):
 
     def get_pitch_options(self, note_harmonies, prev):
         pitch_options = [prev - 2, prev - 1, prev + 1, prev + 2]
-        pitch_options = [p for p in pitch_options if p % 12 in note_harmonies and p in self.vln_all_notes]
+        pitch_options = [p for p in pitch_options if p % 12 in note_harmonies and p in self.melody_register]
         if len(pitch_options) == 0:
             if prev % 12 in note_harmonies and random.random() < .12:
                 pitch_options = [prev]
             else:
                 pitch_options = [prev - 5, prev - 4, prev - 3, prev + 3, prev + 4, prev + 5]
-                pitch_options = [p for p in pitch_options if p % 12 in note_harmonies and p in self.vln_all_notes]
+                pitch_options = [p for p in pitch_options if p % 12 in note_harmonies and p in self.melody_register]
             # if len(pitch_options) == 0:
             #     pitch_options = [prev - 8, prev - 7, prev - 6, prev + 6, prev + 7, prev + 8]
             #     pitch_options = [p for p in pitch_options if p % 12 in note_harmonies]
@@ -717,7 +768,7 @@ class Song(object):
         set_start_end(harmonies)
 
         # Pick a random pitch from the instrument's register on which to start
-        previous_note_index = random.choice(range(int(len(register) * .4)))
+        previous_note_index = random.choice(range(int(len(register))))
         prev = register[previous_note_index]
 
         previous_note = {'duration': 1.0, 'pitch': prev}
@@ -858,5 +909,3 @@ if __name__ == '__main__':
             piece.score.show('musicxml', '/Applications/Finale 2012.app')
         else:
             piece.score.show('musicxml', '/Applications/Sibelius 7.5.app')
-
-    print soloists_history.most_common()
