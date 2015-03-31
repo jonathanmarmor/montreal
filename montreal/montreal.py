@@ -526,7 +526,7 @@ class Song(object):
             vib_lowest = int(self.piece.instruments.vib.lowest_note.ps)
             vib_highest = int(self.piece.instruments.vib.highest_note.ps)
             if not history['vib']:
-                prev_vib_chord = random_vibraphone_voicing()
+                prev_vib_chord = random_vibraphone_voicing(vib_lowest, vib_highest)
                 history['vib'].append(prev_vib_chord)
 
             vibraphone = []
@@ -582,7 +582,7 @@ class Song(object):
                 })
 
             if size > 1:
-                num_accompanists = random.randint(2, len(soloist_options))
+                num_accompanists = 2  # random.randint(2, len(soloist_options))
                 accompanists = random.sample(soloist_options, num_accompanists)
                 for acc in accompanists:
                     soloist_options.remove(acc)
