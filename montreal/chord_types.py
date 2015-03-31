@@ -1,38 +1,10 @@
 import random
 
-from utils import weighted_choice, count_intervals, scale, get_inversions
-import context_free_harmony
+from utils import weighted_choice
 
 
-# CHORD_TYPES = []
-# for chord in context_free_harmony.chord_types:
-#     CHORD_TYPES.extend(get_inversions(chord))
-
-
-# def validate_harmony(harmony):
-#     harmony = harmony[:]
-#     interval_count = count_intervals(harmony)
-#     intervals = interval_count.keys()
-#     if set([1, 6, 11]).intersection(intervals):
-#         return False
-#     if tuple(harmony[:-1]) in CHORD_TYPES:
-#         return False
-#     return True
-
-
-# def get_random_harmony():
-#     num_notes = random.randint(3, 5)
-#     harmony = random.sample(range(12), num_notes)
-#     harmony.sort()
-#     lowest = min(harmony)
-#     harmony = [p - lowest for p in harmony]
-#     if not validate_harmony(harmony):
-#         return get_random_harmony()
-#     return tuple(harmony)
-
-
-# The result of running get_random_harmony 10000 times:
-OTHERS = [
+# See Animal Play chord_types.py for how this list was generated
+other_harmonies = [
     (0, 3, 10),
     (0, 2, 7, 9),
     (0, 2, 5, 7, 9),
@@ -62,30 +34,35 @@ OTHERS = [
     (0, 3, 5, 10)
 ]
 
-def get_random_valids():
-    number = random.randint(4, 7)
-    harmonies = random.sample(OTHERS, number)
-    # harmonies = []
-    # while len(harmonies) < number:
-    #     harmony = get_random_harmony()
-    #     if harmony not in harmonies:
-    #         harmonies.append(harmony)
-    return harmonies
+
+def choose_primary():
+    options = [
+        (0, 4, 7),
+        (0, 3, 7),
+        (0, 4, 7, 10),
+        (0, 3, 7, 10),
+        (0, 7),
+        (0, 4, 7, 11),
+        (0, 5, 7),
+        (0, 5),
+        (0, 4),
+    ]
+    weights = [
+        47,
+        19,
+        15,
+        7,
+        6,
+        2,
+        2,
+        1,
+        1,
+    ]
+    return weighted_choice(options, weights)
 
 
-def get_harmony_generator():
-    other_harmonies = get_random_valids()
-
-    if random.random() < .7:
-        # fewer other harmonies
-        percent_other = scale(random.random(), 0, 1, 0.0, 0.1)
-
+def get_chord_type():
+    if random.random() < .1:
+        return random.choice(other_harmonies)
     else:
-        # more other harmonies
-        percent_other = scale(random.random(), 0, 1, 0.1, 0.6)
-
-    while True:
-        if random.random() < percent_other:
-            yield random.choice(other_harmonies)
-        else:
-            yield context_free_harmony.choose()
+        return choose_primary()

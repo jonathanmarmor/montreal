@@ -40,7 +40,7 @@ from utils import get_at
 from utils import get_by_attr
 import harmonic_rhythm
 import form
-from chord_types import get_harmony_generator
+from chord_types import get_chord_type
 from melody_rhythm import get_melody_rhythm
 import scored_ornaments
 from bass import next_bass_note
@@ -344,7 +344,6 @@ class Song(object):
         self.piece = piece
         self.movement = movement
         self.prev_root = random.randint(0, 11)
-        self.harmony_generator = get_harmony_generator()
 
         self.instruments = self.piece.instruments
 
@@ -388,22 +387,21 @@ class Song(object):
 
 
         root = random.randint(0, 12)
-        self.harmony_history = [[(p * root) % 12 for p in self.choose_harmony()]]
+        self.harmony_history = [[(p * root) % 12 for p in get_chord_type()]]
 
         for name in self.form.bar_types:
             bar_type = self.form.bar_types[name]
             bar_type.harmonic_rhythm = harmonic_rhythm.choose(bar_type.duration)
 
-            chord_type_options = []
-            while len(chord_type_options) < 5:
-                harm = self.harmony_generator.next()
-                if harm not in chord_type_options:
-                    chord_type_options.append(harm)
-
             # Harmony
             bar_type.harmony = []
             for harm_dur in bar_type.harmonic_rhythm:
-                harmony = animal_play_harmony.choose_next_harmony(self.harmony_history, chord_type_options)
+
+                chord_type = get_chord_type()
+
+                print 'CHORD TYPE:', chord_type
+
+                harmony = animal_play_harmony.choose_next_harmony(self.harmony_history, chord_type)
                 self.harmony_history.append(harmony)
 
                 print 'HARMONY:', harmony
@@ -485,11 +483,11 @@ class Song(object):
                 'tpt',
             ]
             soloist_weights = [
-                39,
+                35,
                 26,
-                15,
-                12,
-                8,
+                16,
+                13,
+                10,
             ]
             soloists = []
 
@@ -537,6 +535,7 @@ class Song(object):
                     'duration': harm['duration'],
                     'pitch': vib_pitches,
                 })
+
 
             # Bass
             bass_lowest = self.piece.instruments.bs.lowest_note.ps
@@ -646,7 +645,7 @@ class Song(object):
 
     def choose_harmony(self):
         root = self.choose_root()
-        chord_type = self.harmony_generator.next()
+        chord_type = get_chord_type()
         return self.build_chord(root, chord_type)
 
     def build_chord(self, root, chord_type):

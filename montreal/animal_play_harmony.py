@@ -99,48 +99,32 @@ def get_interval_content(chord):
     return tuple([content[i] for i in range(1, 7)])
 
 
-def choose_next_harmony(history, chord_type_options):
+def choose_next_harmony(history, chord_type):
     last = history[-1]
+    intervals = pitches_to_intervals(chord_type)
+    chords = build_chord_type_on_all_roots(intervals)
 
     scored = []
+    for chord in chords:
+        transition_score = score_transition(last, chord)
+        scored.append({
+            'chord': chord,
+            'chord_type': chord_type,
+            'transition_score': transition_score,
+        })
 
-    for chord_type in chord_type_options:
-        intervals = pitches_to_intervals(chord_type)
-        harmony_score = score_chord(intervals)
-
-        chords = build_chord_type_on_all_roots(intervals)
-
-        for chord in chords:
-            transition_score = score_transition(last, chord)
-            scored.append({
-                'chord': chord,
-                'chord_type': chord_type,
-                'transition_score': transition_score,
-                'harmony_score': harmony_score,
-            })
-
-    for rank, chord in enumerate(sorted(scored, key=lambda x: x['transition_score'])):
-        chord['transition_rank'] = rank
-
-    for rank, chord in enumerate(sorted(scored, key=lambda x: x['harmony_score'])):
-        chord['harmony_rank'] = rank
-        chord['rank'] = chord['harmony_rank'] + chord['transition_rank']
-
-    scored.sort(key=lambda x: x['rank'])
+    scored.sort(key=lambda x: x['transition_score'], reverse=True)
 
     options = scored[:6]
-
     weights = [10, 5, 3, 2, 1]
-
-    # for item, weight in zip(options, weights):
-    #     print weight, item
-
     choice = weighted_choice(options, weights)
     return choice['chord']
 
 
 def score_transition(a, b):
     score = 0
+    if a == b:
+        return 0
     for ap, bp in itertools.product(a, b):
         interval = ap - bp
         interval = abs(interval)
@@ -157,45 +141,17 @@ def score_transition(a, b):
         elif interval == 5:
             score += 10
 
-    score = score / (len(a) + len(b))
+    len_b = len(b)
+
+    score = score / len_b
+
+    if len_b <= 3:
+        score += 50
 
     return score
 
 
-def score_chord(chord):
-    intervals = get_interval_content(chord)
-    # From http://musiccog.ohio-state.edu/home/data/_uploaded/pdf/Music%20Perception/MP%2094Sp%20Interval-Class%20Content%20in%20Equally%20Tempered%20Pitch-Class%20Sets%20-%20Common%20Scales%20Exhibit%20optimum%20Tonal%20Consonance.pdf
-    # weights = (-1.428, -0.582, 0.594, 0.386, 1.240, -0.453)
-    # My tweaks
-    weights = (-1.828, 0.15, 0.686, 0.894, 1.240, -0.403)
 
-    len_chord = len(chord)
-    n_intervals = len_chord * ((len_chord) - 1)
-
-    score = sum([count * weight for count, weight in zip(intervals, weights)]) / n_intervals
-
-    # collapse rankings by number of notes a bit
-    # n_notes_correction = scale(6 - len_chord, -5, 5, -0.2, 0.2)
-    # score = score + n_notes_correction
-
-    # Promote and demote special chords
-    if chord == (3, 5, 4):
-        score += 0.2
-    elif chord == (3, 4, 5):
-        score += 0.1
-    elif chord == (2, 4, 3, 3):
-        score += 0.122
-    elif chord == (2, 10):
-        score += 0.18
-    elif chord == (4, 4, 4):
-        score -= 0.235
-    # elif chord == (3, 3, 6):
-    # elif chord == (3, 3, 3, 3):
-
-    # TODO do some kind of boosting if a chord occurs in the harmonic series up to 9
-
-
-    return score
 
 
 def score_chords():
