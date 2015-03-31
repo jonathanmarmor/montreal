@@ -421,6 +421,7 @@ class Song(object):
 
         size = 1
         for bar in self.bars:
+            bar.parts = []
 
             bar.melody = bar.type_obj.melody
             bar.harmony = bar.type_obj.harmony
@@ -437,8 +438,8 @@ class Song(object):
 
 
             transposition = weighted_choice(
-                [-2, -1, 0, 1, 2],
-                [10, 12, 2, 8, 12]
+                [-2, -1, 1, 2],
+                [10, 12, 8, 12]
             )
 
             if transposition != 0:
@@ -505,6 +506,15 @@ class Song(object):
 
             soloists_history[tuple(sorted(soloists))] += 1
 
+
+            # self.add_soloists_melody(soloists, bar)
+
+            for soloist in soloists:
+                bar.parts.append({
+                    'instrument_name': soloist,
+                    'notes': bar.melody,
+                })
+
             # Violin
             violin_lowest = self.piece.instruments.vln.lowest_note.ps
             violin_highest = self.piece.instruments.vln.highest_note.ps
@@ -559,8 +569,7 @@ class Song(object):
                 history['bs'].append(pitch)
 
 
-
-            bar.parts = [
+            bar.parts.extend([
                 {
                     'instrument_name': 'vln',
                     'notes': violin,
@@ -573,13 +582,7 @@ class Song(object):
                     'instrument_name': 'bs',
                     'notes': bass,
                 },
-            ]
-
-            for soloist in soloists:
-                bar.parts.append({
-                    'instrument_name': soloist,
-                    'notes': bar.melody,
-                })
+            ])
 
             if size > 1:
                 num_accompanists = 2  # random.randint(2, len(soloist_options))
