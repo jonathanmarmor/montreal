@@ -46,6 +46,7 @@ import scored_ornaments
 from bass import next_bass_note
 from violin import next_violin_note
 from simple_accompaniment import next_simple_accompaniment_note
+from vibraphone import random_vibraphone_voicing, next_vibraphone_chord
 import animal_play_harmony
 
 
@@ -522,14 +523,16 @@ class Song(object):
                 history['vln'].append(pitch)
 
             # Vibraphone
-            vib_lowest = self.piece.instruments.vib.lowest_note.ps
-            vib_highest = self.piece.instruments.vib.highest_note.ps
-            # if vib_prev_chord == None:
-            #     vib_prev_chord = random.randint(vib_lowest, vib_lowest + 18)
+            vib_lowest = int(self.piece.instruments.vib.lowest_note.ps)
+            vib_highest = int(self.piece.instruments.vib.highest_note.ps)
+            if not history['vib']:
+                prev_vib_chord = random_vibraphone_voicing()
+                history['vib'].append(prev_vib_chord)
 
             vibraphone = []
             for harm in bar.harmony:
-                vib_pitches = [p + vib_lowest + 7 for p in harm['pitch']]
+
+                vib_pitches = next_vibraphone_chord(history['vib'][-1], harm['pitch'], vib_lowest, vib_highest)
 
                 vibraphone.append({
                     'duration': harm['duration'],
