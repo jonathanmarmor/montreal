@@ -661,6 +661,12 @@ class Song(object):
 
             size = 1 if size > 1 else 2
 
+    def is_melody_in_instrument_register(self, melody, instrument_name):
+        instrument = self.instruments.d[instrument_name]
+        register = instrument.all_notes
+
+        return self.is_melody_in_register(melody, register)
+
     def is_melody_in_register(self, melody, register):
         for note in melody:
             if note['pitch'] != 'rest' and note['pitch'] not in register:
@@ -710,17 +716,27 @@ class Song(object):
             can_go_up = self.can_transpose(12, melody, soloist)
             can_go_down = self.can_transpose(-12, melody, soloist)
 
-            if soloist in ['fl', 'ob']:
-                direction = weighted_choice(['down', 'no change', 'up'], [1, 5, 4])
-            elif soloist == 'cl':
-                direction = weighted_choice(['down', 'no change', 'up'], [2, 3, 1])
-            elif soloist in ['sax', 'tpt']:
-                direction = weighted_choice(['down', 'no change', 'up'], [4, 5, 1])
+            if not self.is_melody_in_instrument_register(melody, soloist):
+                if can_go_up:
+                    melody = self.transpose_melody(melody, 12)
+                if can_go_down:
+                    melody = self.transpose_melody(melody, -12)
 
-            if direction == 'down' and can_go_down:
-                melody = self.transpose_melody(melody, -12)
-            elif direction == 'up' and can_go_up:
-                melody = self.transpose_melody(melody, 12)
+            else:
+                if soloist in ['fl', 'ob'] and can_go_up and random.random() < .8:
+                    melody = self.transpose_melody(melody, 12)
+                elif soloist == 'cl':
+                    if random.random() < .8:
+                        options = [None]
+                        if can_go_up:
+                            options.append(12)
+                        if can_go_down:
+                            options.append(-12)
+                        trans = random.choice(options)
+                        if trans:
+                            melody = self.transpose_melody(melody, trans)
+                elif soloist in ['sax', 'tpt'] and can_go_down and random.random() < .4:
+                    melody = self.transpose_melody(melody, -12)
 
             bar.parts.append({
                 'instrument_name': soloist,
