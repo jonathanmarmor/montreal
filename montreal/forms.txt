@@ -4,7 +4,6 @@ a-b- c-b- d-b- c-b-
 a-b- c-b- c-d- a-b-
 a-b- ccb- dcb- a-b-
 a-b- a-b- c-d- a-b-
-a-bb a-bc d-bb a-be
 a-bc a-dc e-bc a-dc
 a-bc a-dc e--- a-dc
 a-bc a-dc e--- a-bc
@@ -20,7 +19,6 @@ a-b- a-b- cdc a-b-
 a-a- b-a- cd- b-a-
 a-bc a-bd e---bc a-bd
 a-bb a-cb a-d--- a-bb
-a-bb a-cb d-bb e-cb
 a-b--- a-b--- c-d- b---
 a-b--- a-a- ccd a-b---
 a---b- a---c- a--- d--- a---
@@ -44,8 +42,6 @@ abac d-e- afag h-e-
 abac d-e- afag d-h-
 abcb d-e- fbgb h-e-
 abcb d-e- f-cb abcb
-abaa c--- d-e- abaa
-aab---ac aad---ac
 ab---ac- ad---ac-
 a-b- a-b- cdef a-b-
 a-bc a-bc defc a-bc
@@ -55,15 +51,11 @@ a-bc d-bc e-fc a-bc
 a-b- a-b- ccdc a-b-
 a-b- c-b- ddb- c-b-
 a-b- c-b- ddb- a-b-
-aabc aabc aad- aabc
 a-b- a-b- cdef a-b-
 a-bc a-bc defc a-bc
 abcd abcd e--- abcd
-abcb abcb d--- abcb
 abcb abcd e--- abcb
-abcb abcd e-cb abcb
 abcb abcd e-cd abcb
-abac abac d--- abac
 a-a- b-a- c-de b-a-
 a-a- b-a- ccdc b-a-
 a-a- b-a- ccde b-a-

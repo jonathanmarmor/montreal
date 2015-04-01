@@ -1,4 +1,5 @@
 import random
+from collections import Counter
 
 
 class Form(object):
@@ -7,6 +8,7 @@ class Form(object):
         self.form_string = form_string
         self.bars = []
         self.bar_types = {}
+        self.type_count = Counter()
         for char in form_string:
             if char != '-':
                 b = Bar(char)
@@ -15,8 +17,10 @@ class Form(object):
                 b.duration += 2
 
         for bar in self.bars:
+            self.type_count[bar.type] += 1
             if bar.type not in self.bar_types:
                 self.bar_types[bar.type] = BarType(bar.type, bar.duration)
+            self.bar_types[bar.type].count += 1
             bar.type_obj = self.bar_types[bar.type]
 
         self.duration = sum([b.duration for b in self.bars])
@@ -47,20 +51,23 @@ class BarType(object):
         self.melody = []
         self.harmony = []
 
+        self.count = 0
+
     def __repr__(self):
         return 'Bar Type: name: {} duration: {} parts: '.format(self.name, self.duration, self.parts)
 
 
 def parse_file():
     filename = '/Users/jmarmor/repos/jonathanmarmor/montreal/montreal/forms.txt'
-    return [Form(line) for line in open(filename)]
+    return [line for line in open(filename)]
 
 
 FORMS = parse_file()
 
 
 def choose():
-    return random.choice(FORMS)
+    form_string = random.choice(FORMS)
+    return Form(form_string)
 
 
 if __name__ == '__main__':

@@ -150,14 +150,14 @@ class Instruments(object):
 
         # lowest, highest notes
         ranges = [
-            ('C4', 'C7'),  # Flute
-            ('B-3', 'G#6'),  # Oboe
-            ('D3', 'G6'),  # Clarinet
-            ('D-3', 'A-5'),  # Sax
-            ('E3', 'B-5'),  # Trumpet
-            ('G3', 'B6'),  # Violin
-            ('F3', 'F6'),  # Vibraphone
-            ('E1', 'G3')  # Bass
+            ('C4', 'C7'),     # Flute     60 96
+            ('B-3', 'G#6'),   # Oboe      58 92
+            ('D3', 'G6'),     # Clarinet  50 91
+            ('D-3', 'A-5'),   # Sax       49 80
+            ('E3', 'B-5'),    # Trumpet   52 82
+            ('G3', 'B6'),     # Violin
+            ('F3', 'F6'),     # Vibraphone
+            ('E1', 'G3')      # Bass
         ]
         for r, i in zip(ranges, self.l):
             i.lowest_note = Pitch(r[0])
@@ -173,8 +173,10 @@ class Instruments(object):
             'fl',
             'tpt',
         ]
-        lowest = int(max([self.d[name].lowest_note.ps for name in soloists]))
-        highest = int(min([self.d[name].highest_note.ps for name in soloists]))
+        lowest_notes = [self.d[name].lowest_note.ps for name in soloists]
+        lowest = int(max(lowest_notes))
+        highest_notes = [self.d[name].highest_note.ps for name in soloists]
+        highest = int(min(highest_notes))
         return range(lowest, highest + 1)
 
 
@@ -401,6 +403,52 @@ class Song(object):
         root = random.randint(0, 12)
         self.harmony_history = [[(p * root) % 12 for p in get_chord_type()]]
 
+
+
+        # for each bar_type pick a transposition pattern
+        # for each bar of that type, assign the next transposition in the pattern
+        # make a sub register of the soloists' common register for the bar_type,
+        # that has a buffer to allow the melody to be transposed the amount that it will be transposed
+        trans_patterns = {
+            'descending': [
+                [0, -1, -2, -3, -4],
+                [0, -2, -1, -3, -2],
+                [0, -1, -3, -5, -7],
+                [0, -2, -4, -6, -8],
+                [0, -2, -4, -5, -7],
+            ],
+            'ascending': [
+                [0, 1, 2, 3, 4],
+                [0, 2, 1, 3, 2],
+                [0, 2, 4, 5, 7],
+                [0, 2, 3, 5, 7],
+                [0, 2, 4, 6, 8],
+            ]
+        }
+        for name in self.form.bar_types:
+            bar_type = self.form.bar_types[name]
+
+            bar_type.direction = random.choice(trans_patterns.keys())
+            options = trans_patterns[bar_type.direction]
+            bar_type.trans_pattern = random.choice(options)
+            bar_type.trans_pattern = bar_type.trans_pattern[:bar_type.count + 1]
+
+
+            if bar_type.direction == 'descending':
+                bar_type.furthest_transposition = min(bar_type.trans_pattern)
+                bar_type.register = self.melody_register[abs(bar_type.furthest_transposition):]
+            else:
+                bar_type.furthest_transposition = max(bar_type.trans_pattern)
+                bar_type.register = self.melody_register[:-bar_type.furthest_transposition]
+
+        bar_type_counter = Counter()
+        for bar in self.bars:
+            bar_type = self.form.bar_types[bar.type]
+            i = bar_type_counter[bar.type]
+            bar.transposition = bar_type.trans_pattern[i]
+            bar_type_counter[bar.type] += 1
+
+
         for name in self.form.bar_types:
             bar_type = self.form.bar_types[name]
             bar_type.harmonic_rhythm = harmonic_rhythm.choose(bar_type.duration)
@@ -425,13 +473,15 @@ class Song(object):
                 bar_type.harmony.append(h)
 
             # Melody
-            bar_type.melody = self.choose_melody_notes(bar_type.duration, bar_type.harmony)
+            bar_type.melody = self.choose_melody_notes(bar_type.duration, bar_type.harmony, bar_type)
 
 
         #### Turn Bar Types into Bars
 
+
         size = 1
         for bar in self.bars:
+
             bar.parts = []
 
             bar.melody = bar.type_obj.melody
@@ -481,23 +531,14 @@ class Song(object):
             soloists_history[tuple(sorted(soloists))] += 1
 
 
+            # transposition = weighted_choice(
+            #     [-2, -1, 1, 2],
+            #     [10, 12, 8, 12]
+            # )
+
             transposition = self.add_soloists_melody(soloists, bar)
 
             if transposition != 0:
-                melody = []
-                print 'before', bar.melody
-                for note in bar.melody:
-                    if note['pitch'] == 'rest':
-                        new_pitch = 'rest'
-                    else:
-                        new_pitch = note['pitch'] + transposition
-                    melody.append({
-                        'pitch': new_pitch,
-                        'duration': note['duration']
-                    })
-                bar.melody = melody
-                print 'after', bar.melody
-
                 harmony = []
                 for note in bar.harmony:
                     harmony.append({
@@ -621,61 +662,90 @@ class Song(object):
             size = 1 if size > 1 else 2
 
     def add_soloists_melody(self, soloists, bar):
-        melody_pitches = []
+        # melody_pitches = []
+        # for note in bar.melody:
+        #     if note['pitch'] != 'rest':
+        #         for orn in note.get('ornaments', []):
+        #             melody_pitches.append(orn['pitch'])
+        #         melody_pitches.append(note['pitch'])
+
+        # melody_lowest = min(melody_pitches)
+        # melody_highest = max(melody_pitches)
+
+        # if len(soloists) == 2:
+        #     lowest_a = int(self.piece.instruments.d[soloists[0]].lowest_note.ps)
+        #     highest_a = int(self.piece.instruments.d[soloists[0]].highest_note.ps)
+        #     register_a = range(lowest_a, highest_a + 1)
+
+        #     lowest_b = int(self.piece.instruments.d[soloists[1]].lowest_note.ps)
+        #     highest_b = int(self.piece.instruments.d[soloists[1]].highest_note.ps)
+        #     register_b = range(lowest_b, highest_b + 1)
+
+        #     register = list(set(register_a).intersection(set(register_b)))
+
+        # else:
+        #     lowest = int(self.piece.instruments.d[soloists[0]].lowest_note.ps)
+        #     highest = int(self.piece.instruments.d[soloists[0]].highest_note.ps)
+
+        #     register = range(lowest, highest + 1)
+
+        # register_lowest = min(register)
+        # register_highest = max(register)
+
+        # # if melody_lowest >= register_lowest and melody_highest <= register_highest:
+        # #     # No transposition necessary
+
+        # #     for soloist in soloists:
+        # #         bar.parts.append({
+        # #             'instrument_name': soloist,
+        # #             'notes': bar.melody,
+        # #         })
+        # # else:
+        # transposition = 0
+        # if melody_lowest < register_lowest:
+        #     transposition = register_lowest - melody_lowest
+        # elif melody_highest > register_highest:
+        #     transposition = register_highest - melody_highest
+
+        # # print transposition, 'melody_lowest', melody_lowest, 'register_lowest', register_lowest, 'melody_highest', melody_highest, 'register_highest', register_highest
+
+        # for soloist in soloists:
+        #     bar.parts.append({
+        #         'instrument_name': soloist,
+        #         'notes': bar.melody,
+        #     })
+
+        transposition = bar.transposition
+
+        melody = []
         for note in bar.melody:
-            if note['pitch'] != 'rest':
-                for orn in note.get('ornaments', []):
-                    melody_pitches.append(orn['pitch'])
-                melody_pitches.append(note['pitch'])
+            new_note = note.copy()
 
-        melody_lowest = min(melody_pitches)
-        melody_highest = max(melody_pitches)
+            if note['pitch'] == 'rest':
+                new_note['pitch'] = 'rest'
+            else:
+                new_note['pitch'] = note['pitch'] + transposition
 
-        if len(soloists) == 2:
-            lowest_a = int(self.piece.instruments.d[soloists[0]].lowest_note.ps)
-            highest_a = int(self.piece.instruments.d[soloists[0]].highest_note.ps)
-            register_a = range(lowest_a, highest_a + 1)
+            new_note['ornaments'] = []
+            for orn in note.get('ornaments', []):
+                new_orn = orn.copy()
+                new_orn['pitch'] = orn['pitch'] + transposition
+                new_note['ornaments'].append(new_orn)
 
-            lowest_b = int(self.piece.instruments.d[soloists[1]].lowest_note.ps)
-            highest_b = int(self.piece.instruments.d[soloists[1]].highest_note.ps)
-            register_b = range(lowest_b, highest_b + 1)
+            melody.append(new_note)
 
-            register = list(set(register_a).intersection(set(register_b)))
-
-        else:
-            lowest = int(self.piece.instruments.d[soloists[0]].lowest_note.ps)
-            highest = int(self.piece.instruments.d[soloists[0]].highest_note.ps)
-
-            register = range(lowest, highest + 1)
-
-        register_lowest = min(register)
-        register_highest = max(register)
-
-        if melody_lowest >= register_lowest and melody_highest <= register_highest:
-            # No transposition necessary
-
-            for soloist in soloists:
-                bar.parts.append({
-                    'instrument_name': soloist,
-                    'notes': bar.melody,
-                })
-        else:
-            print 'melody_lowest', melody_lowest, 'register_lowest', register_lowest, 'melody_highest', melody_highest, 'register_highest', register_highest
-
-            for soloist in soloists:
-                bar.parts.append({
-                    'instrument_name': soloist,
-                    'notes': bar.melody,
-                })
+        print
+        print 'Bar Type', bar.type
+        print 'Transposition', bar.transposition
+        print 'melody first note before', bar.melody[0]['pitch'], 'after', melody[0]['pitch']
 
 
+        for soloist in soloists:
+            bar.parts.append({
+                'instrument_name': soloist,
+                'notes': melody,
+            })
 
-
-        transposition = 0
-        # transposition = weighted_choice(
-        #     [-2, -1, 1, 2],
-        #     [10, 12, 8, 12]
-        # )
         return transposition
 
 
@@ -714,7 +784,7 @@ class Song(object):
     #     highest = lowest + width
     #     return self.vln_all_notes[lowest:highest]
 
-    def choose_melody_notes(self, duration, harmonies):
+    def choose_melody_notes(self, duration, harmonies, bar_type):
         # return a list of {pitch, duration} dicts
         notes = []
 
@@ -738,7 +808,7 @@ class Song(object):
                 'duration': r
             })
 
-        self.choose_melody_pitches(notes, self.melody_register, harmonies, start_with_rest)
+        self.choose_melody_pitches(notes, bar_type.register, harmonies, start_with_rest)
 
         notes = self.add_ornaments(notes)
 
@@ -881,6 +951,7 @@ class Song(object):
                 'pitch': n,
                 'duration': 0
             })
+
 
     def add_ornaments(self, notes):
         new_notes = []
