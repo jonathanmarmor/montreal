@@ -40,7 +40,7 @@ from utils import get_at
 from utils import get_by_attr
 import harmonic_rhythm
 import form
-from chord_types import get_chord_type
+from chord_types import get_chord_type, diatonic_scales_for_harmony, other_scales_for_harmony
 from melody_rhythm import get_melody_rhythm
 import scored_ornaments
 from bass import next_bass_note
@@ -48,6 +48,7 @@ from violin import next_violin_note
 from simple_accompaniment import next_simple_accompaniment_note
 from vibraphone import random_vibraphone_voicing, next_vibraphone_chord
 import animal_play_harmony
+import scalar_ornaments
 
 
 soloists_history = Counter()
@@ -74,6 +75,13 @@ def choose(options, chosen):
 def ornament_bridge(a, b, n=None, prev_duration=0.75, width=2):
     """Find notes that bridge the interval between a and b"""
 
+    if n == None:
+        # Choose the number of notes in the ornament
+        if prev_duration >= 0.75:
+            n = weighted_choice([1, 2, 3, 4, 5, 6], [3, 3, 4, 5, 4, 3])
+        else:
+            n = weighted_choice([1, 2, 3], [3, 4, 5])
+
     interval = b - a
     abs_interval = abs(interval)
     direction = 0
@@ -81,13 +89,6 @@ def ornament_bridge(a, b, n=None, prev_duration=0.75, width=2):
         direction = 1
     if interval < 0:
         direction = -1
-
-    if n == None:
-        # Choose the number of notes in the ornament
-        max_notes = 3
-        if prev_duration >= 0.75:
-            max_notes = 6
-        n = random.randint(1, max_notes)
 
     if direction == 0:
         option_groups = [range(int(a - width), int(a + width + 1))] * n
@@ -899,15 +900,7 @@ class Song(object):
             first = False
 
 
-    def add_ornament(self, note, prev, harmonies, first):
-        if prev['duration'] <= .25 or random.random() < .1:
-            return
-
-        # Choose between two completely different ways of making ornaments
-
-        if first or random.random() < .4:
-            # harmonies = [p for p in [h for h in harmonies]]
-
+    def add_scalar_ornament(self, note, prev, harmonies):
             interval = prev['pitch'] - note['pitch']
             if interval > 0:
                 direction = 'ascending'
@@ -918,22 +911,87 @@ class Song(object):
 
             # Choose the number of notes in the ornament
             if prev['duration'] >= 1:
-                max_notes = 4
-                n = weighted_choice(range(1, max_notes + 1), [10, 9, 7, 5])
+                n = weighted_choice([1, 2, 3, 4], [1, 2, 4, 6])
             elif prev['duration'] >= 0.75:
-                max_notes = 3
-                n = random.randint(1, max_notes)
+                n = weighted_choice([1, 2, 3], [1, 2, 4])
             else:
-                max_notes = 2
-                n = random.randint(1, max_notes)
+                n = random.randint(1, 2)
 
-            orn = scored_ornaments.choose(n, direction)
+            orn = scalar_ornaments.choose(n, direction)
 
-            np = int(note['pitch'])
-            orn_type = [np + p for p in orn]
+            harm = []
+            for chord in harmonies:
+                for p in chord:
+                    if p not in harm:
+                        harm.append(p)
 
+            scale_options = diatonic_scales_for_harmony(harm)
+
+            if random.random() < .16 or not scale_options:
+                scale_options = other_scales_for_harmony(harm)
+
+            if scale_options:
+                scale_type = random.choice(scale_options)
+
+                note_pitch = int(note['pitch'])
+
+                note_pitch_class = note_pitch % 12
+
+                diff = note_pitch - note_pitch_class
+                scale = []
+                for octave in [diff - 12, diff, diff + 12]:
+                    for pc in scale_type:
+                        p = pc + octave
+                        scale.append(p)
+
+                i = scale.index(note_pitch)
+                scale = scale[i - 2:i + 3]
+
+                orn_type = []
+                for i in orn:
+                    pitch = scale[i + 2]
+                    orn_type.append(pitch)
+
+                return orn_type
+
+    def add_chromatic_interval(self, note, prev):
+        interval = prev['pitch'] - note['pitch']
+        if interval > 0:
+            direction = 'ascending'
+        if interval < 0:
+            direction = 'descending'
+        if interval == 0:
+            direction = random.choice(['ascending', 'descending'])
+
+        # Choose the number of notes in the ornament
+        if prev['duration'] >= 1:
+            max_notes = 4
+            n = weighted_choice(range(1, max_notes + 1), [10, 9, 7, 5])
+        elif prev['duration'] >= 0.75:
+            max_notes = 3
+            n = random.randint(1, max_notes)
         else:
+            max_notes = 2
+            n = random.randint(1, max_notes)
 
+        orn = scored_ornaments.choose(n, direction)
+
+        np = int(note['pitch'])
+        orn_type = [np + p for p in orn]
+        return orn_type
+
+    def add_ornament(self, note, prev, harmonies, first):
+        if prev['duration'] <= .25 or random.random() < .1:
+            return
+
+        # Choose between three completely different ways of making ornaments
+
+        orn_type = None
+        rand = random.random()
+
+        if rand < .7:
+            orn_type = self.add_scalar_ornament(note, prev, harmonies)
+        elif rand < .9:
             orn_type = ornament_bridge(
                 prev['pitch'],
                 note['pitch'],
@@ -941,6 +999,10 @@ class Song(object):
                 prev_duration=prev['duration'],
                 width=2
             )
+
+        if not orn_type or rand >= .9:
+            orn_type = self.add_chromatic_interval(note, prev)
+
 
         note['ornaments'] = []
         for n in orn_type:
