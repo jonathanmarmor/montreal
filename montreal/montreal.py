@@ -391,7 +391,7 @@ class Song(object):
                 tempo_options = range(42, 54, 2)
         elif self.movement > 20 and self.movement <= 25:
             tempo_options = range(36, 48, 2)
-        if self.movement > 30:
+        if self.movement > 25:
             tempo_options = range(26, 38, 2)
 
         self.tempo = random.choice(tempo_options)
