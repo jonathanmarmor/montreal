@@ -44,7 +44,7 @@ from chord_types import get_chord_type, diatonic_scales_for_harmony, other_scale
 from melody_rhythm import get_melody_rhythm
 import scored_ornaments
 from bass import next_bass_note
-from violin import next_violin_note
+from violin import next_violin_dyad
 from simple_accompaniment import next_simple_accompaniment_note
 from vibraphone import random_vibraphone_voicing, next_vibraphone_chord
 import animal_play_harmony
@@ -553,12 +553,16 @@ class Song(object):
             violin_lowest = self.piece.instruments.vln.lowest_note.ps
             violin_highest = self.piece.instruments.vln.highest_note.ps
             if not history['vln']:
-                violin_prev_pitch = random.randint(violin_lowest + 7, violin_highest - 18)
-                history['vln'].append(violin_prev_pitch)
+                p = random.randint(violin_lowest + 7, violin_highest - 18)
+                rand_interval = random.randint(-7, 7)
+                violin_prev_dyad = [p, p + rand_interval]
+
+
+                history['vln'].append(violin_prev_dyad)
 
             violin = []
             for chord in bar.harmony:
-                pitch = next_violin_note(history['vln'][-1], chord['pitch'], violin_lowest, violin_highest)
+                pitch = next_violin_dyad(history['vln'][-1], chord['pitch'], violin_lowest, violin_highest)
 
                 violin.append({
                     'duration': chord['duration'],
