@@ -45,7 +45,7 @@ from melody_rhythm import get_melody_rhythm
 import scored_ornaments
 from bass import next_bass_note
 from violin import next_violin_dyad
-from simple_accompaniment import next_simple_accompaniment_note
+from simple_accompaniment import next_simple_accompaniment_dyad
 from vibraphone import random_vibraphone_voicing, next_vibraphone_chord
 import animal_play_harmony
 import scalar_ornaments
@@ -630,17 +630,23 @@ class Song(object):
 
                     lowest = self.piece.instruments.d[acc].lowest_note.ps
                     highest = self.piece.instruments.d[acc].highest_note.ps
+
+
                     if not history[acc]:
                         quarter_of_register = (highest - lowest) / 4
                         lower_limit = int(lowest + quarter_of_register)
                         higher_limit = int(highest - quarter_of_register)
 
-                        prev_pitch = random.randint(lower_limit, higher_limit)
-                        history[acc].append(prev_pitch)
+                        p = random.randint(lower_limit, higher_limit)
+                        rand_interval = random.randint(-4, 4)
+                        prev_dyad = [p, p + rand_interval]
+
+                        history[acc].append(prev_dyad)
+
 
                     acc_notes = []
                     for chord in bar.harmony:
-                        pitch = next_simple_accompaniment_note(history[acc][-1], chord['pitch'], lowest, highest)
+                        pitch = next_simple_accompaniment_dyad(history[acc][-1], chord['pitch'], lowest, highest)
 
                         acc_notes.append({
                             'duration': chord['duration'],

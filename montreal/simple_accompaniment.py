@@ -21,8 +21,7 @@ def rank_by_distance(previous, options):
     return [item[1] for item in new_ranks]
 
 
-def next_simple_accompaniment_note(previous, harmony, lowest_pitch, highest_pitch):
-    harmony = [p % 12 for p in harmony]
+def rank_options(previous, harmony, lowest_pitch, highest_pitch):
     options = [p for p in range(previous - 7, previous + 8) if p % 12 in harmony and p >= lowest_pitch and p <= highest_pitch]
     ranked_by_distance = rank_by_distance(previous, options)
 
@@ -35,6 +34,32 @@ def next_simple_accompaniment_note(previous, harmony, lowest_pitch, highest_pitc
     for k in sorted(ranks.keys(), reverse=True):
         random.shuffle(ranks[k])
         ranked.extend(ranks[k])
+
+    return ranked
+
+
+def next_simple_accompaniment_dyad(previous, harmony, lowest_pitch, highest_pitch):
+    harmony = [p % 12 for p in harmony]
+
+    prev_lower = min(previous)
+    prev_higher = max(previous)
+
+    lower_ranked = rank_options(prev_lower, harmony, lowest_pitch, highest_pitch)
+    higher_ranked = rank_options(prev_higher, harmony, lowest_pitch, highest_pitch)
+
+    ranked = []
+    for lower_rank, lower in enumerate(lower_ranked):
+        for higher_rank, higher in enumerate(higher_ranked):
+            interval = higher - lower
+            if interval > 0 and interval < 6:
+                rank = lower_rank + higher_rank
+                ranked.append({
+                    'rank': lower_rank + higher_rank,
+                    'dyad': [lower, higher]
+                })
+
+    ranked.sort(key=lambda x: x['rank'])
+    ranked = [r['dyad'] for r in ranked]
 
     weights = exp_weights(len(ranked))
     return weighted_choice(ranked, weights)
