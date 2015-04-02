@@ -911,7 +911,7 @@ class Song(object):
 
             # Choose the number of notes in the ornament
             if prev['duration'] >= 1:
-                n = weighted_choice([1, 2, 3, 4], [1, 2, 4, 6])
+                n = weighted_choice([1, 2, 3, 4, 5, 6], [2, 3, 4, 6, 5, 4])
             elif prev['duration'] >= 0.75:
                 n = weighted_choice([1, 2, 3], [1, 2, 4])
             else:
