@@ -264,7 +264,7 @@ class Piece(object):
         ]
 
         # 8 to 12 minutes
-        max_duration = 24
+        max_duration = 12
         piece_duration_minutes = scale(random.random(), 0, 1, 8, max_duration)
 
         # Make the "songs"
@@ -381,18 +381,21 @@ class Song(object):
         self.duration_beats = self.form.duration
 
 
-        if self.movement <= 10:
-            tempo_options = range(50, 62, 2)
-        elif self.movement > 10 and self.movement <= 20:
-            speed = random.choice(['fast', 'fast', 'slow'])
-            if speed == 'fast':
-                tempo_options = range(60, 72, 2)
-            else:
-                tempo_options = range(42, 54, 2)
-        elif self.movement > 20 and self.movement <= 25:
-            tempo_options = range(36, 48, 2)
-        if self.movement > 25:
-            tempo_options = range(26, 38, 2)
+        if self.movement <= 5:
+            # Medium
+            tempo_options = range(56, 66, 2)
+        elif self.movement in [6, 8, 10, 12]:
+            # Fast
+            tempo_options = range(66, 78, 2)
+        elif self.movement in [7, 9, 11]:
+            # Slow
+            tempo_options = range(42, 54, 2)
+        elif self.movement in [13, 14]:
+            # Slower
+            tempo_options = range(36, 42, 2)
+        elif self.movement > 14:
+            # Grind to a halt
+            tempo_options = range(22, 34, 2)
 
         self.tempo = random.choice(tempo_options)
 
