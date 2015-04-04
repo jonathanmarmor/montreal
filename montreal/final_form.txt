@@ -1,0 +1,93 @@
+Final Form
+
+Song 1
+a-bcd---e-bcd---
+Song Duration: 33
+Tempo: 58
+Number of Beats: 32
+
+Song 2
+a-b-c-a-c-a-d---c-a-
+Song Duration: 43
+Tempo: 56
+Number of Beats: 40
+
+Song 3
+a-b-c-a-d-b-c-a-
+Song Duration: 32
+Tempo: 60
+Number of Beats: 32
+
+Song 4
+a-bca-bde---bca-bd
+Song Duration: 37
+Tempo: 58
+Number of Beats: 36
+
+Song 5
+abc-abc-d-c-abc-
+Song Duration: 32
+Tempo: 60
+Number of Beats: 32
+
+Song 6
+abcbadedafgfahih
+Song Duration: 27
+Tempo: 70
+Number of Beats: 32
+
+Song 7
+a-bca-bde---bca-bd
+Song Duration: 51
+Tempo: 42
+Number of Beats: 36
+
+Song 8
+ab---ac-ad---ac-
+Song Duration: 25
+Tempo: 76
+Number of Beats: 32
+
+Song 9
+a-bca-dce---a-dc
+Song Duration: 42
+Tempo: 46
+Number of Beats: 32
+
+Song 10
+a-b---a-b---c-d-b---
+Song Duration: 35
+Tempo: 68
+Number of Beats: 40
+
+Song 11
+a---bcdca---ecfc
+Song Duration: 44
+Tempo: 44
+Number of Beats: 32
+
+Song 12
+abcbabcde---abcb
+Song Duration: 26
+Tempo: 74
+Number of Beats: 32
+
+Song 13
+a---b-c-defgb-c-
+Song Duration: 53
+Tempo: 36
+Number of Beats: 32
+
+Song 14
+a-b-c-a-d-b-c-a-
+Song Duration: 53
+Tempo: 36
+Number of Beats: 32
+
+Song 15
+a-bca-dce---a-dc
+Song Duration: 80
+Tempo: 24
+Number of Beats: 32
+
+Total Duration: 10:15
