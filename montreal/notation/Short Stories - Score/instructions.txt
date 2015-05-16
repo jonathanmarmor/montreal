@@ -1,0 +1,82 @@
+Instructions
+
+The instructions and rhythm notation conventions used are intended to force the
+performers to agree on a unique performance practice. You'll need to work
+through how the ornaments are paced and other rhythmic details as a group in
+person.
+
+It's in fifteen 25-80 second movements, separated by double bar lines. They can
+be recorded separately, but should be edited together so the melody part of the
+next movement starts right when the fermata of the previous movement ends.
+
+There are two instrument groups: Melody and Rhythm Section. The Melody
+alternates between wind instrument soloists and two wind instruments playing in
+unison or octaves. The Rhythm Section consists of pizzicato Bass, Vibraphone,
+and Violin throughout. Two other wind instruments join the Rhythm Section every
+other phrase.
+
+Dynamics:
+The Melody part should always be louder than and clearly distinct from the
+Rhythm Section. Throughout the whole piece, alternating phrases should lilt
+between quieter and louder, but transitions shouldn't be abrupt. When the melody
+is played by two instruments and there are two additional winds playing with the
+rhythm section the ensemble sound should be louder.
+
+Rhythm:
+The ensemble should play together, but the rhythm should be fluid, without a
+strong pulse, and with a tempo that expands and contracts in response to the
+shape of the musical content.
+Check out the tracks in this playlist to get the feel of the rhythms of the
+accompaniment and solos:
+https://play.spotify.com/user/jmrmr/playlist/1ZPDtj0Nv3XhMDDW21mEVX .
+
+This track is the best example of rhythms for the accompaniment parts,
+especially the bass and vibraphone:
+https://soundcloud.com/jonathanmarmor/013c?in=jonathanmarmor/sets/chords .
+
+Melodies in winds:
+- Entire phrases can be moved up or down an octave.
+- Ornaments should be played quickly.
+- A note and all the ornaments that precede it, or two notes and the ornaments
+between them, should be played as a single gesture.
+- It's up to you whether to play the ornaments on the beat, before the beat, or
+in between. But when you are playing in unison with someone else you need to
+play it together, so you'll likely need to decide how to play the phrase ahead
+of time.
+- Rhythms should be fluid and float on top of the rest of the ensemble, as long
+as the chord changes line up with the right spot in the melody.
+
+Violin, and Winds when you have a dyad written:
+- Play one of the two pitches, or alternate between the two.
+- Rhythm options:
+    - Sustain a pitch.
+    - Pulse on one pitch two to five notes per quarter note, somewhat steadily,
+    constantly slightly changing tempo, rarely or never in time with quarters,
+    eighths, eighth note triplets, or sixteenths.
+    - Alternate between the two pitches using a similar rhythm as described
+    above.
+- One option for the Winds is to imitate the rhythm and phrasing of the Violin.
+
+Violin:
+- You are part of the rhythm section, along with the bass and vibraphone.
+- It might be best to use a mute or stand far away from the rest of the
+ensemble. Figure it out in rehearsals.
+
+Vibraphone:
+- Arpeggiate the chords.
+- Sweeping up and down.
+- 4 mallets, if that's comfortable.
+- Strike two notes at once when possible, both in one hand, if possible.
+- Out of time.
+- Play two to five notes per quarter note, somewhat steadily, constantly
+slightly changing tempo, rarely or never in time with quarters, eighths,
+eighth note triplets, or sixteenths.
+- Open and sustaining for the duration of each notated chord.
+- Pedal at every chord change, but try to carry over notes from the previous
+chord if possible.
+
+Bass:
+- Pizzicato throughout.
+- Rhythm: Pulse two to five notes per quarter note, somewhat steadily,
+constantly slightly changing tempo, rarely or never in time with quarters,
+eighths, eighth note triplets, or sixteenths.
