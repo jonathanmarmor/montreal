@@ -1,0 +1,45 @@
+TODO
+
+- Fix some rhythms
+- fermatas at end of each movement
+- test creating parts
+- instructions
+- come up with a title
+-
+- possibly start some movements with no bass/vibes/violin
+
+
+
+x - soloists in their ranges
+x - dyads in simple accompaniment and violin parts
+
+
+
+
+Manual:
+- sections with sustained tones/chords with space in between
+- section near/at end with copy/pasted melodies, starting with one instr, then adding the rest one by one, manually change pitches to harmonize
+    - start with solo violin
+    - second time start with oboe+sax in unison
+
+- Add a bell, a la Exultet: https://open.spotify.com/track/412JPUhQ7Cj7yQKgbV4Uuz, and that other bulgarian thing with a bell
+
+- remember that trumpet and sax are great improvisors
+
+
+- instructions for bass, vibes, violin, accompaniment parts
+- echoing accompaniments?
+- dynamics?
+-
+
+
+
+
+Cleanup:
+x - make 4/4 where possible
+- beaming
+- get rid of duplicate time signatures
+
+
+Parts
+- transpositions

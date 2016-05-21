@@ -1,0 +1,44 @@
+Hackathon Day-Of TODO
+
+Before 11:30:
+
+x Doorstop
+
+x Test projector
+    x - mini-display-port
+    - HDMI
+    - VGA
+    - DVI
+x Test handheld mics
+x Test Livestream
+x Tweet Livestream Link
+x Check if conf room is available for workshops
+
+
+Test projector and audio in conf room
+Bring extra chairs into conf room
+
+
+
+After Talks:
+Test PA
+
+Livestream right now of talks at the Soundscapes Hackathon at Spotify NYC:
+
+Citygram: NYU's remote audio sensor network project
+Interactive Sonic Ecosystems
+Dynamic Representation of Sounds in the Brain
+
+http://livestream.com/accounts/3104006/events/3951917
+
+
+
+
+TODO pt 2
+
+get everyone to fill out form
+Test multiple AV inputs on stage
+
+future hackathons planning sesh: Travis, Adam November, Thor
+
+
